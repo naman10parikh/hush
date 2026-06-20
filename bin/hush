@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+// hush — the secrets employee's CLI entry point.
+// Thin launcher: the real program is the compiled ESM at dist/cli/index.js.
+// (Source lives in src/cli/ as strict TypeScript; `pnpm build` compiles it.)
+//
+// HARD invariant (brain O-09): hush returns handles/verdicts, NEVER raw secret
+// values — enforced inside the command bodies, not here.
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import { existsSync } from "node:fs";
+
+const here = dirname(fileURLToPath(import.meta.url));
+const entry = join(here, "..", "dist", "cli", "index.js");
+
+if (!existsSync(entry)) {
+  process.stderr.write(
+    "[hush] dist/cli/index.js not found — run `pnpm build` first.\n",
+  );
+  process.exit(127);
+}
+
+await import(entry);
