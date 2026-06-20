@@ -1,7 +1,14 @@
 name: hush RSI
-# CP123: dispatch-only until the RSI engine (workflows/rsi.workflow.js + eval gate) is built in Wave B/E.
-# The Claude half additionally needs CLAUDE_CODE_OAUTH_TOKEN (chairman checklist, D8). Guarded = always green.
+# CP123 (D2): the deterministic RSI engine (workflows/rsi.workflow.js, cluster E4) is
+# $0/tokenless — refresh-tool-matrix-versions → re-verify-brain-pins → run-eval-pyramid
+# → propose → test-gate. The schedule below is ENABLED. It is GUARDED-GREEN: if the
+# engine isn't built yet it exits 0 (never a red merge surface). The Claude half of RSI
+# additionally needs CLAUDE_CODE_OAUTH_TOKEN (chairman checklist, D8) — its absence is
+# NOT a gap; the deterministic half runs without it.
 on:
+  # 09:17 UTC daily (off-peak; odd minute to avoid the top-of-hour GHA stampede).
+  schedule:
+    - cron: "17 9 * * *"
   workflow_dispatch:
 
 permissions:
@@ -12,9 +19,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Engine guard
+      - name: Detect runtime
+        id: rt
         run: |
-          if [ ! -f workflows/rsi.workflow.js ]; then
-            echo "RSI engine not built yet (CP123 cluster E) — exiting green."; exit 0
+          if [ -f package.json ] && [ -f workflows/rsi.workflow.js ]; then
+            echo "armed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "armed=false" >> "$GITHUB_OUTPUT"
           fi
-          echo "engine present — deterministic half would run here (wired in cluster E)"
+      - uses: pnpm/action-setup@v4
+        if: steps.rt.outputs.armed == 'true'
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        if: steps.rt.outputs.armed == 'true'
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Run deterministic RSI engine ($0, tokenless)
+        if: steps.rt.outputs.armed == 'true'
+        run: |
+          pnpm install --frozen-lockfile || pnpm install
+          # The deterministic engine: detects tool-version drift, re-verifies brain
+          # pins, re-runs the eval pyramid, proposes (does NOT auto-commit). $0.
+          node workflows/rsi.workflow.js
+      - name: Engine guard (not built yet)
+        if: steps.rt.outputs.armed == 'false'
+        run: |
+          echo "RSI engine (workflows/rsi.workflow.js, cluster E4) not present yet — exiting green."
+          exit 0
