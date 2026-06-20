@@ -128,3 +128,25 @@ export function stripUrlQuery(text: string): string {
 export function sanitize(text: string): string {
   return redact(stripUrlQuery(text));
 }
+
+/**
+ * Deep-redact any JSON-serializable value: every string (including object keys)
+ * is run through `redact()`. Arrays and plain objects are walked recursively;
+ * non-string primitives pass through unchanged. This is the mechanical O-09
+ * enforcement gate for structured surfaces (the MCP tool returns, C1) — even if a
+ * tool body regressed and put a secret-shaped string in a field, it cannot leave
+ * the process. Cyclic structures are not expected here (tool results are plain
+ * data), so no cycle guard is added (Karpathy: no machinery for impossible cases).
+ */
+export function redactValue(value: unknown): unknown {
+  if (typeof value === "string") return redact(value);
+  if (Array.isArray(value)) return value.map(redactValue);
+  if (value !== null && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      out[redact(k)] = redactValue(v);
+    }
+    return out;
+  }
+  return value;
+}
