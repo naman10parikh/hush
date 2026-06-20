@@ -23,4 +23,6 @@ packages/web/.next/
 # Obsidian temp files
 vault/Untitled*.base
 
-.env
+# Secrets — ignore every .env variant, but KEEP the schema file tracked (JOB 1, brain O-01/P-01)
+.env*
+!.env.example
