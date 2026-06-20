@@ -1,0 +1,52 @@
+{
+  "name": "hush",
+  "version": "0.1.0",
+  "description": "The fleet's secrets-management employee — issued, never leaked; rotated, then proven. Returns handles, never values.",
+  "type": "module",
+  "bin": {
+    "hush": "./bin/hush"
+  },
+  "main": "./dist/cli/index.js",
+  "types": "./dist/cli/index.d.ts",
+  "files": [
+    "bin/",
+    "dist/",
+    "skills/",
+    "brain/",
+    "README.md",
+    "AGENTS.md",
+    "llms.txt"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "ai",
+    "claude",
+    "agent",
+    "secrets",
+    "gitleaks",
+    "rotation",
+    "sops",
+    "dev-tools",
+    "energy"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "eval": "node eval/run.mjs",
+    "darwin-check": "node ~/darwin/bin/darwin-check.mjs",
+    "prepublishOnly": "pnpm build && pnpm test"
+  },
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}

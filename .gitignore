@@ -2,6 +2,11 @@
 .wikimem-cache/
 node_modules/
 
+# Build artifacts (TypeScript → dist; published to npm via package.json "files", never committed)
+dist/
+*.tsbuildinfo
+.cache/
+
 # WikiMem test vault personal data
 my-wiki/raw/
 tools/agentgrid/app/release/
