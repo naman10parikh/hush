@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hush — secrets cockpit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<!-- Masthead — the word IS the product: keep the secret quiet (BRAND.md). -->
+<header class="masthead">
+  <div class="brand">
+    <div class="wordmark">hush</div>
+    <div class="tagline">Issued, never leaked. <span class="amber">Rotated, then proven.</span></div>
+  </div>
+  <div class="stat-strip" id="stat-strip">
+    <div class="stat"><div class="v num" id="stat-evals">—</div><div class="k">evals pass</div></div>
+    <div class="stat"><div class="v num accent" id="stat-accept">—</div><div class="k">acceptance</div></div>
+    <div class="stat"><div class="v num" id="stat-runs">—</div><div class="k">runs logged</div></div>
+    <div class="stat"><div class="v num" id="stat-redact">—</div><div class="k">redaction</div></div>
+  </div>
+</header>
+
+<div class="shell">
+  <!-- Rail — the four views (PLAN §10). -->
+  <nav class="rail">
+    <button data-view="brain" class="active"><i class="ph ph-brain"></i> Brain</button>
+    <button data-view="runs"><i class="ph ph-scroll"></i> Run log</button>
+    <button data-view="evals"><i class="ph ph-check-square-offset"></i> Evals</button>
+    <button data-view="ask"><i class="ph ph-chats-circle"></i> Ask hush</button>
+    <div class="rail-foot">
+      hush's doctrine, what it did, and what it can tell you.<br><br>
+      <strong class="amber">handles, never values</strong> — this cockpit will never show you a raw secret.<br><br>
+      The chairman's eyes · <code>127.0.0.1</code> only · read-only.
+    </div>
+  </nav>
+
+  <main class="stage">
+    <!-- 1. Brain browser -->
+    <section id="view-brain" class="view active">
+      <div class="view-head">
+        <h2 class="display">The doctrine</h2>
+        <input id="brain-q" type="search" placeholder="Search the six brain files…">
+      </div>
+      <div class="brain-layout">
+        <aside class="brain-index" id="brain-index"></aside>
+        <article class="brain-reader" id="brain-reader">
+          <div class="empty">Select a brain file, or click a <span class="wikilink-demo">[[wikilink]]</span> to navigate the doctrine graph.</div>
+        </article>
+        <aside class="brain-graph-panel">
+          <h3 class="panel-title">Wikilink graph</h3>
+          <div id="brain-graph"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 2. Run log -->
+    <section id="view-runs" class="view">
+      <div class="view-head">
+        <h2 class="display">What hush did</h2>
+        <button class="ghost-btn" id="runs-refresh"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+      </div>
+      <div class="runs-summary bento" id="runs-summary"></div>
+      <div class="runs-table-wrap">
+        <div class="tr th"><span class="td">when</span><span class="td">command</span><span class="td">job</span><span class="td">outcome</span><span class="td">findings</span><span class="td">ms</span></div>
+        <div id="runs-table"></div>
+      </div>
+      <div class="redact-note" id="runs-redact-note"></div>
+    </section>
+
+    <!-- 3. Eval scores -->
+    <section id="view-evals" class="view">
+      <div class="view-head">
+        <h2 class="display">Golden-task board</h2>
+        <button class="ghost-btn" id="evals-refresh"><i class="ph ph-arrows-clockwise"></i> Re-run</button>
+      </div>
+      <div class="eval-banner" id="eval-banner"></div>
+      <div class="eval-board" id="eval-board"></div>
+    </section>
+
+    <!-- 4. Ask the employee -->
+    <section id="view-ask" class="view">
+      <div class="view-head">
+        <h2 class="display">Ask the employee</h2>
+      </div>
+      <div class="ask-intro">
+        hush answers with <strong class="amber">doctrine and verdicts</strong> — the right fix, the false-greens to reject, the portfolio for the job. It will never hand back a secret value.
+      </div>
+      <div class="ask-controls">
+        <div class="mode-toggle" id="ask-mode">
+          <button data-mode="advise" class="active">Advise on a situation</button>
+          <button data-mode="tool">Recommend tools for a job</button>
+        </div>
+        <div class="ask-bar">
+          <input id="ask-input" type="text" placeholder="e.g. I committed a .env with our API key — does git rm --cached fix it?">
+          <button id="ask-send" class="amber-btn"><i class="ph-fill ph-paper-plane-tilt"></i> Ask</button>
+        </div>
+        <div class="ask-examples" id="ask-examples"></div>
+      </div>
+      <div class="ask-answer" id="ask-answer"></div>
+    </section>
+  </main>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
