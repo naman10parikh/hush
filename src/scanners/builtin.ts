@@ -48,7 +48,14 @@ function git(args: readonly string[], cwd: string): string {
 
 function isGitRepo(cwd: string): boolean {
   try {
-    git(["rev-parse", "--is-inside-work-tree"], cwd);
+    // stdio: pipe (not inherit) so git's "fatal: not a git repository" stderr is
+    // captured here, never bled to the user's terminal — a non-git path is an
+    // expected, handled case, not an error the user should see raw.
+    execFileSync("git", ["rev-parse", "--is-inside-work-tree"], {
+      cwd,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    });
     return true;
   } catch {
     return false;

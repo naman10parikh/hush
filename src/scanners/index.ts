@@ -5,6 +5,7 @@
  * core); gitleaks/trufflehog augment it when present. Returns merged, redacted
  * findings + an exit code (1 if any finding — the acceptance bar).
  */
+import { existsSync, statSync } from "node:fs";
 import { builtinScan, type Finding } from "./builtin.js";
 import { gitleaksScan } from "./gitleaks.js";
 import { trufflehogVerify } from "./trufflehog.js";
@@ -34,9 +35,31 @@ export function scanRepo(req: ScanRequest): ScanReport {
   const findings: Finding[] = [];
   const notes: string[] = [];
 
+  // 0) Path guard — a secrets scanner must NEVER report a false "all clear" for
+  // a path it could not scan (a typo'd path is the most dangerous false-negative
+  // — the same false-green class hush exists to prevent). If the path is missing,
+  // surface it loudly with a nonzero exit; the caller must not read this as clean.
+  if (!existsSync(req.path) || !statSync(req.path).isDirectory()) {
+    return {
+      findings: [],
+      exitCode: 2,
+      scanners: { builtin: false, gitleaks: false, trufflehog: false },
+      notes: [
+        `path not found or not a directory: ${req.path} — nothing scanned (this is NOT an all-clear)`,
+      ],
+    };
+  }
+
   // 1) Built-in scanner — always (offline, no binary needed).
   const builtin = builtinScan(req.path, { history: req.history });
   findings.push(...builtin.findings);
+  // If the path exists but is not a git repo, the tracked-files scan saw nothing
+  // — say so, so a clean result isn't mistaken for "scanned and safe".
+  if (!builtin.scanned_working_tree) {
+    notes.push(
+      `${req.path} is not a git repository — built-in scan inspects git-tracked files, so 0 findings here does NOT mean clean. Run \`git init\` or point at a repo.`,
+    );
+  }
 
   // 2) gitleaks (preferred) — protect for staged, detect otherwise.
   const gl = gitleaksScan(req.path, req.staged ? "protect" : "detect");
