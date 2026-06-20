@@ -22,6 +22,14 @@ K="${ACCEPT_K:-3}"
 note() { printf '  %s\n' "$*"; }
 fail() { printf 'ACCEPTANCE FAIL: %s\n' "$*" >&2; exit 1; }
 
+# The planted DUMMY value, defined ONCE so the plant and the O-09 leak-check
+# reference the same literal (single source of truth). It matches the scanner's
+# anthropic-key prefix so the finding fires when committed to HISTORY (where the
+# working-tree dummy-skip does NOT apply), yet the literal `DUMMY` marker makes
+# hush's OWN working-tree self-scan AND ci.yml's secret-scan skip this source line
+# — so dogfooding doesn't false-flag the acceptance script itself.
+PLANTED_KEY='sk-ant-api03-DUMMYXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+
 # Plant a dummy secret (NOT a real key) into a throwaway repo's history — the
 # realistic "leaked .env committed" case. mktemp keeps each run isolated.
 plant_repo() {
@@ -31,10 +39,7 @@ plant_repo() {
   git -C "$dir" config user.email accept@hush.test
   git -C "$dir" config user.name hush-accept
   git -C "$dir" config commit.gpgsign false
-  # Planted DUMMY value (all-x): matches the scanner's anthropic-key prefix so the
-  # finding fires, is obviously not a real credential, and reads as a dummy to the
-  # CI secret-scan (its `x{6,}` allowlist) so dogfooding doesn't false-flag this file.
-  printf 'ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n' > "$dir/leaked.env"
+  printf 'ANTHROPIC_API_KEY=%s\n' "$PLANTED_KEY" > "$dir/leaked.env"
   git -C "$dir" add leaked.env
   git -C "$dir" commit -qm plant
   printf '%s' "$dir"
@@ -67,7 +72,7 @@ run_once() {
   [ "$scan_rc" -ne 0 ] || fail "block1: scan on planted key exited 0 (expected nonzero)"
   printf '%s' "$scan_out" | grep -q '"rule"' || fail "block1: scan output has no rule-bearing finding"
   # O-09: the raw planted value must NOT appear in the scan output (redaction).
-  if printf '%s' "$scan_out" | grep -q 'sk-ant-api03-0000'; then
+  if printf '%s' "$scan_out" | grep -qF "$PLANTED_KEY"; then
     fail "block1: RAW SECRET VALUE in scan output — O-09 violated"
   fi
   note "block1 OK — scan nonzero ($scan_rc) + rule finding + redacted"
