@@ -1,0 +1,88 @@
+{
+  "protocolVersion": "1.0",
+  "name": "hush",
+  "description": "The Energy fleet's secrets-management domain-expert employee — issue/store/scan/rotate/scrub/inject/broker secrets and prevent agents from leaking them. hush scans a repo for leaked secrets and exits nonzero on a finding, gives the real (rotate-first, scrub-second) remediation, wires a scanner/SOPS+age setup, and brokers short-TTL credential handles — always returning handles, never raw values (O-09). It refuses the false-greens (git rm --cached, sops updatekeys-only, GCP 'rotation enabled') and refuses to quote a single price. Boundary: not auth/sign-in/identity (that's badge — hush consumes a machine identity, never owns one, O-15). Tagline: Issued, never leaked. Rotated, then proven. Powered by Energy.",
+  "version": "0.1.0",
+  "documentationUrl": "https://github.com/naman10parikh/hush/blob/main/AGENTS.md",
+  "provider": {
+    "organization": "Energy",
+    "url": "https://github.com/naman10parikh/hush"
+  },
+  "preferredTransport": "stdio",
+  "url": "stdio://hush",
+  "additionalInterfaces": [
+    {
+      "transport": "cli",
+      "url": "node bin/hush <capability> [args] --json",
+      "note": "hush is a stdio-local tool-employee for C1 (no hosted endpoint — PLAN HS-1). Every capability round-trips through the local CLI (`node bin/hush ...`) or the stdio MCP server (`node dist/mcp/server.js`, tool `hush_<capability>`). Scanning runs offline against the local repo."
+    },
+    {
+      "transport": "mcp-stdio",
+      "url": "node dist/mcp/server.js",
+      "note": "JSON-RPC over stdio; tools/list returns hush_scan, hush_doctor, hush_advise, hush_remediate, hush_rotate_plan, hush_broker, hush_tool. Resources: hush://brain/* (read-only doctrine)."
+    }
+  ],
+  "capabilities": ["scan", "doctor", "advise", "remediate", "broker", "tool"],
+  "streaming": false,
+  "pushNotifications": false,
+  "stateTransitionHistory": false,
+  "defaultInputModes": ["text/plain", "application/json"],
+  "defaultOutputModes": ["application/json", "text/plain"],
+  "hardInvariant": "Every capability returns a handle/reference or a verdict — never a `value` field, never a secret-shaped string (O-09).",
+  "skills": [
+    {
+      "id": "scan",
+      "name": "Scan a repo for leaked secrets",
+      "description": "Run the scanning stack (gitleaks prevent/catch + trufflehog verify + .mcp.json literal check + base64). Exit nonzero on any finding; findings are redacted (no raw value). THE acceptance capability.",
+      "tags": ["secrets", "scan", "gitleaks", "trufflehog", "leak-detection"],
+      "cli": "node bin/hush scan <path> --history --json",
+      "mcpTool": "hush_scan",
+      "examples": ["Scan this repo's history for a leaked API key.", "Is there a secret in my .mcp.json?"]
+    },
+    {
+      "id": "doctor",
+      "name": "Report a repo's secret-manager wiring",
+      "description": "Return the wiring report for a repo: gitignore_ok, env_example_schema_only, mcp_refs_ok, scanners_present, sops_breakglass, score. Booleans only, never values.",
+      "tags": ["secrets", "audit", "wiring", "doctor"],
+      "cli": "node bin/hush doctor <path> --json",
+      "mcpTool": "hush_doctor",
+      "examples": ["Is this repo set up to keep secrets out of git?"]
+    },
+    {
+      "id": "advise",
+      "name": "Verdict + doctrine for a remediation question",
+      "description": "Return a verdict + the correct doctrine; flags false-greens (git rm --cached, updatekeys-only, GCP 'rotation enabled'). Returns { verdict, doctrine, false_green, brain_refs }.",
+      "tags": ["secrets", "remediation", "false-green", "doctrine"],
+      "cli": "node bin/hush advise \"<situation>\" --json",
+      "mcpTool": "hush_advise",
+      "examples": ["I ran git rm --cached on the leaked .env — am I clean now?"]
+    },
+    {
+      "id": "remediate",
+      "name": "Ordered rotate-first remediation plan",
+      "description": "Produce the ordered rotate-first plan for a finding (rotate_first:true, consent_required_for_scrub:true). Never auto-rewrites history off an unverified line number (P-04).",
+      "tags": ["secrets", "remediation", "rotate-first", "scrub"],
+      "cli": "node bin/hush remediate \"<finding>\" --json",
+      "mcpTool": "hush_remediate",
+      "examples": ["A key was committed to history — what's the real fix, in order?"]
+    },
+    {
+      "id": "broker",
+      "name": "Return a short-TTL handle for a secret",
+      "description": "Return a handle hush://store/<name> + expiresAt and log the handoff — NEVER the value (O-09). Delivery of the value to a child process happens via `hush inject`.",
+      "tags": ["secrets", "broker", "handle", "no-value"],
+      "cli": "node bin/hush broker <name> --ttl 5m --json",
+      "mcpTool": "hush_broker",
+      "examples": ["Give my agent access to the DB password without putting it in the transcript."]
+    },
+    {
+      "id": "tool",
+      "name": "Recommend the secrets portfolio for a job",
+      "description": "Recommend the portfolio/layer for a job (OpenBao default; SOPS+age for git). Never quotes a single price (G-01). Returns { default, alts, when_alt, billing_note, brain_refs }.",
+      "tags": ["secrets", "tool-selection", "portfolio", "openbao", "sops"],
+      "cli": "node bin/hush tool <job> --json",
+      "mcpTool": "hush_tool",
+      "examples": ["What should I use for short-lived DB credentials?", "How should I encrypt secrets in git?"]
+    }
+  ]
+}

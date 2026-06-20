@@ -1,0 +1,92 @@
+{
+  "name": "hush",
+  "version": "0.1.0",
+  "description": "The Energy fleet's secrets-management domain-expert employee as one installable Claude Code plugin: bundles the `hush` CLI, the `hush` stdio MCP server, the five secrets skills, the secret-scan-gate hook, and the two sub-agent personas. Install to scan a repo for leaked secrets, get the real (rotate-first) remediation, wire a scanner/SOPS+age setup, broker a short-TTL credential handle, and refuse the false-greens — always returning handles, never raw secret values. Boundary: not auth (that's badge). Powered by Energy.",
+  "author": {
+    "name": "Energy fleet",
+    "url": "https://github.com/naman10parikh/hush"
+  },
+  "homepage": "https://github.com/naman10parikh/hush/blob/main/AGENTS.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/naman10parikh/hush.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "secrets",
+    "secrets-management",
+    "gitleaks",
+    "trufflehog",
+    "rotation",
+    "sops",
+    "age",
+    "openbao",
+    "mcp",
+    "handles-not-values",
+    "harness",
+    "agent-native",
+    "energy"
+  ],
+  "bin": {
+    "hush": "./bin/hush"
+  },
+  "skills": "./skills",
+  "agents": "./.claude/agents",
+  "hooks": "./.claude/settings.json",
+  "mcpServers": "./.mcp.json",
+  "bundles": {
+    "cli": {
+      "name": "hush",
+      "bin": "./bin/hush",
+      "commands": [
+        "scan",
+        "doctor",
+        "advise",
+        "remediate",
+        "rotate-plan",
+        "init",
+        "env-example",
+        "broker",
+        "inject",
+        "tool",
+        "runs"
+      ]
+    },
+    "mcpServer": {
+      "name": "hush",
+      "transport": "stdio",
+      "command": "node dist/mcp/server.js",
+      "tools": [
+        "hush_scan",
+        "hush_doctor",
+        "hush_advise",
+        "hush_remediate",
+        "hush_rotate_plan",
+        "hush_broker",
+        "hush_tool"
+      ],
+      "resources": ["hush://brain/*"],
+      "config": "./.mcp.json"
+    },
+    "skills": [
+      "./skills/secret-leak-remediation/SKILL.md",
+      "./skills/scanner-stack-setup/SKILL.md",
+      "./skills/sops-age-gitops/SKILL.md",
+      "./skills/agent-secret-delivery/SKILL.md",
+      "./skills/dynamic-secret-provisioning/SKILL.md"
+    ],
+    "hook": {
+      "name": "secret-scan-gate",
+      "event": "PreToolUse",
+      "matcher": "Write|Edit|MultiEdit",
+      "path": "./.claude/hooks/secret-scan-gate.js",
+      "description": "Parse-time block of a seeded secret-shaped string (entropy + prefix sk-ant-/AKIA/ghp_) and of a non-${VAR} literal written into .mcp.json (brain P-16). The inherited protect-secrets.js (credential files) is kept alongside it via a second matcher (Q-13)."
+    },
+    "agents": [
+      "./.claude/agents/hush-remediation-planner.md",
+      "./.claude/agents/hush-tool-selector.md"
+    ]
+  },
+  "install_instructions": "Add this plugin to Claude Code: Settings → Plugins → Add local plugin → select the hush repo root. The `hush` CLI commands, the five secrets skills, the two sub-agent personas (hush-remediation-planner, hush-tool-selector), and the secret-scan-gate hook become available. The `hush` MCP server is wired via .mcp.json (env-ref tokens, no live keys) — run `pnpm build` first so dist/mcp/server.js exists. HARD invariant: hush returns handles/verdicts, never raw secret values (O-09)."
+}
