@@ -1,0 +1,50 @@
+name: hush acceptance
+# CP123 E3 — THE acceptance gate (PLAN §5; HARNESS-OVERRIDES component 9 + 11).
+# Local-first / $0 / no-creds (D15): the merge gate exercises hush's core
+# capability — `hush scan` flags a planted dummy key (nonzero) and `hush doctor`
+# reports the wiring — against a committed/ephemeral fixture with ZERO provider
+# credentials and NO network. The built-in scanner makes this starvation-proof.
+#
+# This job RED-BLOCKS the merge (no guard that swallows failure once code exists):
+#   1. build
+#   2. the eval pyramid CI-blocking subset (GT-1..GT-10 + GT-15) — `pnpm eval`
+#   3. the acceptance flow pass^3 — sandbox/run-acceptance.sh
+#
+# E2B vs ubuntu (D15 / HARNESS-OVERRIDES): isolation is the need, not E2B
+# specifically. The acceptance test is offline, so the ubuntu-latest runner IS
+# the isolated env — E2B is NOT a hard gate. When E2B_API_KEY is configured, the
+# same sandbox/run-acceptance.sh runs inside the E2B template (sandbox/Dockerfile);
+# absent it, this ubuntu job satisfies the bar. NO provider secret is referenced
+# in any scan block (SEC-0 / Assumption 3).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install + build
+        run: |
+          pnpm install --frozen-lockfile || pnpm install
+          pnpm build
+
+      - name: Eval pyramid — CI-blocking subset (GT-1..GT-10 + GT-15, F1>=0.8, no self-grading)
+        run: pnpm eval
+
+      - name: Acceptance test — scan flags planted key + doctor reports wiring (pass^3, $0/offline)
+        run: bash sandbox/run-acceptance.sh
