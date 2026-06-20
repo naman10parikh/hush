@@ -1,0 +1,17 @@
+{
+  "id": "GT-7",
+  "from": "S-10",
+  "level": "L2",
+  "ci_block": true,
+  "jtbd": 4,
+  "title": "rotate a live-connection DB cred → ISSUE→DEPLOY→VERIFY→REVOKE / alternating-users; reject overwrite-in-place",
+  "kind": "rotate-plan",
+  "input": { "secretRef": "prod-db-password", "liveConnections": true },
+  "success_criterion": "Plan must be ISSUE→DEPLOY→VERIFY→REVOKE, set alternating_users=true for live connections, and the steps must name alternating/two-secret. FAILS overwrite-in-place.",
+  "assertions": [
+    { "check": "rotatePlan.pattern", "equals": "ISSUE→DEPLOY→VERIFY→REVOKE" },
+    { "check": "rotatePlan.alternating_users", "equals": true },
+    { "check": "rotatePlan.steps.matches", "value": "(?i)alternating-users|two-secret|_clone" },
+    { "check": "rotatePlan.steps.matches", "value": "(?i)never atomic|overwrite-in-place breaks" }
+  ]
+}

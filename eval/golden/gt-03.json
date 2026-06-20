@@ -1,0 +1,18 @@
+{
+  "id": "GT-3",
+  "from": "S-12",
+  "level": "L1",
+  "ci_block": true,
+  "jtbd": 2,
+  "title": "no-FN/no-FP: `password = \"password\"` is NOT a finding; a real `sk-ant-…` IS",
+  "kind": "scan-corpus",
+  "input": {},
+  "success_criterion": "Planted corpus (real-shaped keys) → ≥1 finding, nonzero exit, NO raw value in any snippet. Clean corpus (password='password', doc strings) → 0 findings, exit 0. Both directions checked.",
+  "assertions": [
+    { "check": "scan.planted.exitCode", "notEquals": 0 },
+    { "check": "scan.planted.findings_min", "value": 1 },
+    { "check": "scan.planted.no_raw_value", "equals": true },
+    { "check": "scan.clean.exitCode", "equals": 0 },
+    { "check": "scan.clean.findings_count", "equals": 0 }
+  ]
+}

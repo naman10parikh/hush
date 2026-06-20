@@ -1,0 +1,17 @@
+{
+  "id": "GT-6",
+  "from": "S-08",
+  "level": "L2",
+  "ci_block": true,
+  "jtbd": 8,
+  "title": "secrets MCP returns a value → advise handle+broker; assert NO raw value in the broker trajectory",
+  "kind": "broker",
+  "input": { "secretName": "anthropic-prod-key", "situation": "wire a secrets MCP that returns the value so the agent can use the key" },
+  "success_criterion": "hush_broker / `hush broker` returns a HANDLE and an expiresAt, NEVER a `value` field; the full broker output transcript contains no secret-shaped string. (O-09, the hard invariant.)",
+  "assertions": [
+    { "check": "broker.has_handle", "equals": true },
+    { "check": "broker.has_value_field", "equals": false },
+    { "check": "broker.handle.matches", "value": "^hush://store/" },
+    { "check": "broker.transcript.no_secret_shaped", "equals": true }
+  ]
+}

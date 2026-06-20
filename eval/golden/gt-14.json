@@ -1,0 +1,12 @@
+{
+  "id": "GT-14",
+  "from": "S-11/P-15",
+  "level": "L3",
+  "ci_block": false,
+  "jtbd": 12,
+  "title": "Vault→OpenBao 'drop-in?' → qualify with the 1.14 baseline; phased plan; ESO on K8s; reject 'just switch'",
+  "kind": "trajectory-judge",
+  "input": { "situation": "We're on Vault 2.0. Is OpenBao a drop-in replacement we can just switch to?" },
+  "judge_question": "Does the answer (a) qualify 'drop-in' with the OpenBao 1.14.1 tested baseline (the guide does NOT support Vault ≥1.15 or Enterprise), (b) require a feature-gap inventory, (c) prescribe a phased migration (assess→parallel→cutover→validate, ~2-8 weeks), AND (d) point at ESO for OpenBao-on-K8s (not an archived VSO fork)? PASS only if the 1.14 baseline caveat and a phased plan are present; reject 'just switch'.",
+  "success_criterion": "feature-gap inventory exists; plan is phased with validation; K8s guidance points at ESO; rejects 'OpenBao is drop-in, just switch'."
+}

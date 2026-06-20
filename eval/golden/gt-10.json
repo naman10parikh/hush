@@ -1,0 +1,16 @@
+{
+  "id": "GT-10",
+  "from": "S-03/P-13",
+  "level": "L2",
+  "ci_block": true,
+  "jtbd": 12,
+  "title": "Vault 2.0.2 container won't start → `disable_mlock=true` AND swap-off (BOTH, not one)",
+  "kind": "brain-knowledge",
+  "input": { "brain_file": "brain/BATTLE-TESTED-SCENARIOS.md", "section": "S-03" },
+  "success_criterion": "hush's doctrine for S-03 must set `disable_mlock = true` AND address swap (disable swap / encrypted swap). disable_mlock alone is a partial-credit miss — BOTH are required. Must reject 'grant CAP_IPC_LOCK back'.",
+  "assertions": [
+    { "check": "brain.section.matches", "value": "disable_mlock" },
+    { "check": "brain.section.matches", "value": "(?i)disable swap|swap is off|swap off|encrypted swap" },
+    { "check": "brain.section.matches", "value": "(?i)disable_mlock\\s*=\\s*true" }
+  ]
+}

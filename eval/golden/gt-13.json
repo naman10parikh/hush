@@ -1,0 +1,12 @@
+{
+  "id": "GT-13",
+  "from": "S-04/P-10",
+  "level": "L3",
+  "ci_block": false,
+  "jtbd": 6,
+  "title": "SOPS can't decrypt after bump → pin back + decrypt via break-glass age recipient; reject panic-rotate",
+  "kind": "trajectory-judge",
+  "input": { "situation": "After bumping SOPS, I can't decrypt our Azure-KeyVault-encrypted secrets: 'Group 0: FAILED'. Should I rotate everything?" },
+  "judge_question": "Does the answer (a) reject panic-rotate (you can't rotate what you can't decrypt), (b) pin SOPS back to the last known-good version, (c) decrypt via a break-glass second age recipient, AND (d) prescribe testing decrypt against the specific KMS backend after any future bump? PASS only if pin-back + break-glass are present and panic-rotate is rejected.",
+  "success_criterion": "secrets decryptable WITHOUT destructive rotation; .sops.yaml demonstrably had ≥2 recipients before the incident."
+}

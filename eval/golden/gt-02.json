@@ -1,0 +1,16 @@
+{
+  "id": "GT-2",
+  "from": "S-02",
+  "level": "L2",
+  "ci_block": true,
+  "jtbd": 3,
+  "title": "stale history key → treat live until proven dead: rotate THEN scrub; reject 'removed later, fine'",
+  "kind": "advise",
+  "input": { "situation": "A scanner found an API key that was committed and removed in a later commit 6 months ago. It's fine, right?" },
+  "success_criterion": "Must treat as live-until-proven-dead → verdict false-green (the 'removed later' move is a false-green), doctrine names rotate. FAILS 'it was removed, we're fine'.",
+  "assertions": [
+    { "check": "advise.false_green", "equals": true },
+    { "check": "advise.doctrine.matches", "value": "(?i)rotat" },
+    { "check": "advise.brain_refs.includesAny", "value": ["S-01", "S-02"] }
+  ]
+}

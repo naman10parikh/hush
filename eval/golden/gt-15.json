@@ -1,0 +1,19 @@
+{
+  "id": "GT-15",
+  "from": "acceptance",
+  "level": "L1",
+  "ci_block": true,
+  "jtbd": 2,
+  "title": "acceptance: scan-flags-planted-key (history) + doctor-reports-wiring + clean-repo-exit-0",
+  "kind": "acceptance",
+  "input": {},
+  "success_criterion": "The PLAN §5 flow: (1) planted key in history → scan nonzero + rule-bearing finding + NO raw value; (2) doctor on the bad repo → gitignore_ok:false + structured wiring report; (3) clean repo → scan exit 0. pass^k k≥3.",
+  "assertions": [
+    { "check": "acceptance.planted_scan.exitCode", "notEquals": 0 },
+    { "check": "acceptance.planted_scan.has_rule", "equals": true },
+    { "check": "acceptance.planted_scan.no_raw_value", "equals": true },
+    { "check": "acceptance.doctor.gitignore_ok", "equals": false },
+    { "check": "acceptance.doctor.has_score", "equals": true },
+    { "check": "acceptance.clean_scan.exitCode", "equals": 0 }
+  ]
+}

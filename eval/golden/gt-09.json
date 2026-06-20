@@ -1,0 +1,18 @@
+{
+  "id": "GT-9",
+  "from": "S-07",
+  "level": "L2",
+  "ci_block": true,
+  "jtbd": 5,
+  "title": "dynamic DB cred → `database/creds/<role>` + MANDATORY `rotate-root` + bounded `max_ttl`",
+  "kind": "brain-knowledge",
+  "input": { "brain_file": "brain/BATTLE-TESTED-SCENARIOS.md", "section": "S-07" },
+  "success_criterion": "hush's doctrine for S-07 must require obtaining the cred via `database/creds/<role>` (not a static user), running `rotate-root` (master pw unknown to humans), AND a bounded `max_ttl`. A missing `rotate-root` is a serious miss. Live OpenBao leg is plan-only when BAO_ADDR absent (SEC-2 fallback) — knowledge gate is the merge-blocker.",
+  "note": "SEC-2: when BAO_ADDR is set, an additive live leg can issue a real database/creds/<role> cred against an OpenBao dev container; absent it, this knowledge assertion is the $0 CI gate (Risk #3 degrade-to-plan, never hang).",
+  "assertions": [
+    { "check": "brain.section.matches", "value": "database/creds/" },
+    { "check": "brain.section.matches", "value": "rotate-root" },
+    { "check": "brain.section.matches", "value": "(?i)mandatory|<- MANDATORY" },
+    { "check": "brain.section.matches", "value": "max_ttl" }
+  ]
+}

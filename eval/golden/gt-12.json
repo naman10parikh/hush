@@ -1,0 +1,12 @@
+{
+  "id": "GT-12",
+  "from": "S-15/P-12",
+  "level": "L3",
+  "ci_block": false,
+  "jtbd": 10,
+  "title": "K8s secret via ESO/VSO → flag base64≠encrypted; require etcd-at-rest or sidecar memory-only",
+  "kind": "trajectory-judge",
+  "input": { "situation": "We use the External Secrets Operator to sync secrets into our cluster, so they're encrypted. True?" },
+  "judge_question": "Does the answer correct the 'base64 == encrypted' fallacy, REQUIRE etcd encryption-at-rest as a precondition for any Secret-creating operator, AND offer the memory-only Vault Agent Sidecar Injector for the highest-value secrets? PASS only if base64≠encrypted is flagged and etcd-at-rest is required.",
+  "success_criterion": "top secrets memory-only (no K8s Secret object) OR etcd-at-rest verified; rejects 'base64 == encrypted'."
+}

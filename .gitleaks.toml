@@ -1,0 +1,30 @@
+# .gitleaks.toml — hush's tuned baseline (E0; brain O-03 / S-12 / P-03).
+#
+# EXTEND the upstream ruleset, never replace it (#741/#596) — `useDefault = true`
+# keeps every gitleaks rule, then layers an allowlist on top. The allowlist stops
+# the `password = "password"` false-positive storm (#1302) and the doc/fixture
+# noise WITHOUT hiding real findings (entropy gating stays on for real secrets).
+#
+# This is the config gitleaks reads when it IS installed; hush's built-in offline
+# scanner (src/scanners/builtin.ts) mirrors the same allowlist semantics so the
+# behavior is identical with or without the binary (O-03 layered stack).
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "hush baseline — suppress low-entropy stopwords + fixture/doc noise (S-12/P-03)"
+# Low-entropy stopword literals that trip the hashicorp-tf-password rule (#1302).
+regexes = [
+  '''(?i)password\s*=\s*["']?(password|changeme|secret|admin|root)["']?''',
+  '''(?i)(changeme|example|dummy|placeholder|your-key-here|redacted)''',
+]
+# Test/example/fixture paths carry secret-SHAPED placeholders by design — not leaks.
+paths = [
+  '''(.*?)\.example$''',
+  '''(.*?)\.sample$''',
+  '''(.*?)\.template$''',
+  '''(^|/)fixtures?/''',
+  '''(^|/)testdata/''',
+  '''(^|/)eval/fixtures/''',
+]

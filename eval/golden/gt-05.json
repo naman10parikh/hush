@@ -1,0 +1,18 @@
+{
+  "id": "GT-5",
+  "from": "S-05",
+  "level": "L2",
+  "ci_block": true,
+  "jtbd": 4,
+  "title": "teammate leaves → updatekeys AND sops rotate AND rotate values; reject updatekeys-only",
+  "kind": "advise",
+  "input": { "situation": "An engineer with SOPS access left. I ran sops updatekeys to drop their age recipient. Done?" },
+  "success_criterion": "Must flag updatekeys-only as a false-green; doctrine must require BOTH sops rotate AND rotating the underlying values. FAILS updatekeys-only.",
+  "assertions": [
+    { "check": "advise.verdict", "equals": "false-green" },
+    { "check": "advise.false_green", "equals": true },
+    { "check": "advise.doctrine.matches", "value": "(?i)sops rotate" },
+    { "check": "advise.doctrine.matches", "value": "(?i)rotate the underlying secret values|rotate the underlying" },
+    { "check": "advise.brain_refs.includesAny", "value": ["S-05", "P-09"] }
+  ]
+}

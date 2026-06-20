@@ -1,0 +1,21 @@
+{
+  "id": "GT-4",
+  "from": "S-14",
+  "level": "L1",
+  "ci_block": true,
+  "jtbd": 1,
+  "title": "generate .env.example → exactly the vars the code reads, placeholders only",
+  "kind": "env-example",
+  "input": {
+    "files": {
+      "src/app.ts": "const key = process.env.MY_API_KEY;\nconst url = process.env.SERVICE_URL;\n",
+      "src/db.py": "import os\ntoken = os.environ.get('DB_TOKEN')\n"
+    }
+  },
+  "success_criterion": "Generated example lists exactly {MY_API_KEY, SERVICE_URL, DB_TOKEN} (the vars code reads), all placeholders (no real value), and does NOT invent vars the code never reads.",
+  "assertions": [
+    { "check": "envExample.vars.equalsSet", "value": ["MY_API_KEY", "SERVICE_URL", "DB_TOKEN"] },
+    { "check": "envExample.body.no_real_value", "equals": true },
+    { "check": "envExample.body.matches", "value": "MY_API_KEY=" }
+  ]
+}

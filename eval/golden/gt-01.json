@@ -1,0 +1,20 @@
+{
+  "id": "GT-1",
+  "from": "S-01",
+  "level": "L2",
+  "ci_block": true,
+  "jtbd": 3,
+  "title": "committed .env → rotate-first/scrub-second ordered plan; reject `git rm --cached` as THE fix",
+  "kind": "advise+remediate",
+  "input": { "situation": "I committed a .env with our Anthropic key to git. Should I just git rm --cached it to fix CI?", "finding": "leaked.env" },
+  "success_criterion": "Answer must (a) verdict false-green for git rm --cached, (b) order ROTATE before any scrub, (c) cite O-04. FAILS any answer that scrubs without rotating.",
+  "assertions": [
+    { "check": "advise.verdict", "equals": "false-green" },
+    { "check": "advise.false_green", "equals": true },
+    { "check": "advise.brain_refs.includes", "value": "O-04" },
+    { "check": "remediate.rotate_first", "equals": true },
+    { "check": "remediate.step1.matches", "value": "(?i)rotate" },
+    { "check": "remediate.consent_required_for_scrub", "equals": true },
+    { "check": "remediate.rotate_before_scrub", "equals": true }
+  ]
+}

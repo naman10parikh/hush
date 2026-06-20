@@ -1,0 +1,12 @@
+{
+  "id": "GT-11",
+  "from": "S-06",
+  "level": "L3",
+  "ci_block": false,
+  "jtbd": 7,
+  "title": "secret-zero for CI/agent → AppRole role_id in CI + wrapped single-use secret_id; prefer SPIFFE",
+  "kind": "trajectory-judge",
+  "input": { "situation": "A CI pipeline needs its first credential to authenticate to OpenBao without that credential leaking. How?" },
+  "judge_question": "Does the answer (a) keep role_id in CI secrets but NEVER commit a long-lived token or static secret_id, (b) deliver a WRAPPED, single-use, short-TTL secret_id (vault write -wrap-ttl), AND (c) prefer a secret-less workload identity (SPIFFE/cloud-native) where possible? Answer PASS only if all the load-bearing pieces are present.",
+  "success_criterion": "no long-lived token or static secret_id in repo; delivered secret_id is single-use+short-TTL; workload-identity (no-secret) gets full marks."
+}

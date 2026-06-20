@@ -1,0 +1,18 @@
+{
+  "id": "GT-8",
+  "from": "S-09",
+  "level": "L2",
+  "ci_block": true,
+  "jtbd": 4,
+  "title": "'enabled GCP rotation' → flag notify-only; require a Pub/Sub-subscribed rotation fn",
+  "kind": "advise",
+  "input": { "situation": "I enabled rotation on our GCP Secret Manager secret. So it rotates automatically now, right?" },
+  "success_criterion": "Must flag GCP rotation as NOTIFY-ONLY (a false-green) and require a Cloud Function subscribed to the Pub/Sub topic. FAILS 'enabled = it rotates'.",
+  "assertions": [
+    { "check": "advise.verdict", "equals": "false-green" },
+    { "check": "advise.false_green", "equals": true },
+    { "check": "advise.doctrine.matches", "value": "(?i)notify-only" },
+    { "check": "advise.doctrine.matches", "value": "(?i)pub/sub|cloud function|function" },
+    { "check": "advise.brain_refs.includesAny", "value": ["S-09", "P-08"] }
+  ]
+}
