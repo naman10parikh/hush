@@ -11,9 +11,10 @@ dist/
 test-results/
 playwright-report/
 
-# Runlog — derived observability output (component 10; every CLI/RSI run appends one
-# redacted JSON line). The logs/ dir is kept via logs/.gitkeep; the data is not committed.
-logs/runs.jsonl
+# Runlog — component 10 observability output (every CLI/RSI run appends one line
+# through sanitize(): secret-shaped strings redacted + URL queries stripped, O-12/P-17).
+# TRACKED, not ignored — the HARD override requires logs/runs.jsonl be committed; the
+# per-line redaction is what makes committing it safe (0 secret-shaped values, enforced).
 
 # WikiMem test vault personal data
 my-wiki/raw/
