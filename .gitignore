@@ -11,6 +11,10 @@ dist/
 test-results/
 playwright-report/
 
+# Runlog — derived observability output (component 10; every CLI/RSI run appends one
+# redacted JSON line). The logs/ dir is kept via logs/.gitkeep; the data is not committed.
+logs/runs.jsonl
+
 # WikiMem test vault personal data
 my-wiki/raw/
 tools/agentgrid/app/release/
