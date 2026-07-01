@@ -23,7 +23,7 @@ export interface Finding {
   readonly file: string;
   /** Always redacted — never the raw value (O-09). */
   readonly redacted_snippet: string;
-  readonly source: "working-tree" | "history";
+  readonly source: "working-tree" | "working-tree-untracked" | "history";
 }
 
 /**
@@ -88,8 +88,10 @@ function scanText(
     let m: RegExpExecArray | null;
     while ((m = local.exec(text)) !== null) {
       const matched = m[0];
-      // Skip obvious placeholders in the working tree (not in history).
-      if (source === "working-tree" && DUMMY_VALUE.test(matched)) {
+      // Skip obvious placeholders in the working tree (not in history). Applies to
+      // both tracked and untracked working-tree files — a `sk-ant-DUMMY…` sitting
+      // uncommitted is still a placeholder, not a leak.
+      if (source !== "history" && DUMMY_VALUE.test(matched)) {
         if (m.index === local.lastIndex) local.lastIndex++;
         continue;
       }
@@ -126,10 +128,32 @@ function trackedFiles(cwd: string): string[] {
   }
 }
 
+/**
+ * List untracked-but-NOT-gitignored files (`git ls-files --others
+ * --exclude-standard`). These are files the developer has staged for a future
+ * commit — the exact place a pre-commit safety scan must look. Scanning them is
+ * NOT scope creep: `--exclude-standard` still honours .gitignore, so a gitignored
+ * `.env` and node_modules stay skipped, preserving the tracked-scan intent above.
+ * Fixes the false-green where a git repo with an uncommitted secret file reported
+ * "clean" (the same false-all-clear class the path guard in index.ts forbids).
+ */
+function untrackedNonIgnoredFiles(cwd: string): string[] {
+  try {
+    return git(["ls-files", "--others", "--exclude-standard"], cwd)
+      .split("\n")
+      .map((f) => f.trim())
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
 export interface BuiltinScanResult {
   readonly findings: readonly Finding[];
   readonly scanned_working_tree: boolean;
   readonly scanned_history: boolean;
+  /** Count of untracked-but-not-gitignored files that were scanned (about-to-commit surface). */
+  readonly scanned_untracked_count: number;
 }
 
 /**
@@ -144,20 +168,28 @@ export function builtinScan(
   const cwd = path;
   const findings: Finding[] = [];
 
-  // 1) Working tree — tracked files only (skips node_modules, .env via .gitignore).
+  // 1) Working tree — tracked files (skips node_modules, .env via .gitignore) PLUS
+  // untracked-but-not-gitignored files (the about-to-commit surface). Both honour
+  // .gitignore; scanning the untracked set closes the false-green where a fresh
+  // repo's uncommitted secret file reported "clean".
   const repo = isGitRepo(cwd);
   const files = repo ? trackedFiles(cwd) : [];
-  for (const rel of files) {
-    if (ALLOWLIST_FILE.test(rel)) continue;
+  const untracked = repo ? untrackedNonIgnoredFiles(cwd) : [];
+  let scannedUntracked = 0;
+  const scanFile = (rel: string, source: Finding["source"]): void => {
+    if (ALLOWLIST_FILE.test(rel)) return;
     const full = join(cwd, rel);
     try {
-      if (statSync(full).size > MAX_FILE_BYTES) continue;
+      if (statSync(full).size > MAX_FILE_BYTES) return;
       const text = readFileSync(full, "utf8");
-      findings.push(...scanText(text, rel, "working-tree"));
+      findings.push(...scanText(text, rel, source));
+      if (source === "working-tree-untracked") scannedUntracked++;
     } catch {
       // Intentionally silent: unreadable/binary file — not a finding.
     }
-  }
+  };
+  for (const rel of files) scanFile(rel, "working-tree");
+  for (const rel of untracked) scanFile(rel, "working-tree-untracked");
 
   // 2) History — patch content of all commits (catches leaked-then-removed secrets).
   let scannedHistory = false;
@@ -187,5 +219,6 @@ export function builtinScan(
     findings: [...uniq.values()],
     scanned_working_tree: repo,
     scanned_history: scannedHistory,
+    scanned_untracked_count: scannedUntracked,
   };
 }

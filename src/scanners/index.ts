@@ -59,6 +59,13 @@ export function scanRepo(req: ScanRequest): ScanReport {
     notes.push(
       `${req.path} is not a git repository — built-in scan inspects git-tracked files, so 0 findings here does NOT mean clean. Run \`git init\` or point at a repo.`,
     );
+  } else if (builtin.scanned_untracked_count > 0) {
+    // Transparency: the built-in scan also covered untracked-not-ignored files
+    // (the about-to-commit surface). Say so, so a clean result is understood to
+    // include them — and a finding in one is understood to be uncommitted.
+    notes.push(
+      `built-in scan also covered ${builtin.scanned_untracked_count} untracked (not gitignored) file(s) — the about-to-commit surface.`,
+    );
   }
 
   // 2) gitleaks (preferred) — protect for staged, detect otherwise.
