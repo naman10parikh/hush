@@ -40,6 +40,11 @@ jobs:
         if: steps.rt.outputs.armed == 'true'
         run: |
           pnpm install --frozen-lockfile || pnpm install
+          # Build first: the RSI engine's eval step (`pnpm eval` → eval/run.mjs)
+          # imports the compiled TypeScript from dist/, which is gitignored and
+          # never committed. Without this, the eval pyramid fails with
+          # ERR_MODULE_NOT_FOUND (dist/lib/false-green.js). Mirrors acceptance.yml.
+          pnpm build
           # The deterministic engine: detects tool-version drift, re-verifies brain
           # pins, re-runs the eval pyramid, proposes (does NOT auto-commit). $0.
           node workflows/rsi.workflow.js
