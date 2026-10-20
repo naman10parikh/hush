@@ -23,3 +23,8 @@ Every error → root cause → rule. Auto-compressed when >500 lines (memory-com
 - **Open: a locally installed gitleaks fails the clean-repo control.** hush runs gitleaks with its default
   rules on a repo that has no `.gitleaks.toml`, so the clean fixture's decoys are flagged and eval GT-3 fails.
   CI has no gitleaks binary and passes. Decide whether hush should fall back to its own baseline config.
+- **Resolved: the clean-repo control with a local gitleaks.** A scan now passes hush's baseline with `-c` when
+  the repository has no gitleaks config of its own. The baseline itself also missed the decoys: gitleaks matches
+  allowlist regexes against the secret, and for `hashicorp-tf-password` that is the quoted value (`"password"`),
+  not the line. Rule: test an allowlist regex against the secret gitleaks reports, and keep one baseline
+  (`GITLEAKS_BASELINE_TOML`, also what `hush init --scanner` writes).
