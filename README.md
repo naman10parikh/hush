@@ -12,9 +12,9 @@ _Hush is part of an agent-native play for agent-native systems that can eventual
 [AGENTS.md](AGENTS.md) · [llms.txt](llms.txt) · [Skills](skills/) · [Security](SECURITY.md) · [Contributing](CONTRIBUTING.md) · [All projects](https://github.com/naman10parikh)
 <!-- fleet:header:end -->
 
-hush keeps secrets out of git, out of logs and out of an agent's context, and when one leaks it gives the real
-fix: rotate the key at the provider first, prove it, then scrub. It is for coding agents (Claude Code, Codex,
-Cursor and others) and for the people who run them; every tool returns a handle or a verdict, never a raw secret.
+Its job is to keep secrets out of git, out of logs and out of an agent's context. When a key leaks, hush gives
+the real fix: rotate the key at the provider, prove the rotation, then scrub. Every tool returns a handle, a
+verdict or a redacted finding, never a raw secret.
 
 <!-- fleet:use:start -->
 ## Use it from any coding agent
@@ -86,8 +86,8 @@ npx -y -p github:naman10parikh/hush hush --help
 npx -y -p github:naman10parikh/hush hush advise "I ran git rm --cached on the leaked .env, are we fixed?"
 ```
 
-The second command answers `verdict: false-green`: un-tracking a file leaves the key live in history, so the
-fix is to rotate it first.
+The second command answers `verdict: false-green`. A false-green looks fixed but is not. Un-tracking a file
+leaves the key live in git history, so the fix is to rotate the key first.
 
 In a clone, the acceptance test plants a fake key in a throwaway repository, checks that `hush scan` flags it
 and that a clean repository passes, three times, offline:
@@ -101,14 +101,20 @@ It ends with `ACCEPTANCE PASS`.
 ## How it works
 
 **The one rule.** Every CLI command and MCP tool returns a handle (`hush://store/<name>`), a verdict or a
-redacted finding, never a value. When a process needs the value, `hush inject` hands it to the child process,
-so it never enters the model's context, a log or a commit.
+redacted finding, never a value. A value goes to the process that needs it, never to the model, a log or a
+commit.
 
-**What it refuses.** Auth, sign-in and identity belong to badge; hush uses a machine identity and never owns
-one. It will not call a leak fixed after `git rm --cached` or `sops updatekeys` alone, and it will not quote one
-tool's price as fact; it recommends a layered setup instead.
+**What it refuses.** Sign-in and user identity are out of scope. hush uses a machine identity and never owns
+one. It will not call a leak fixed after `git rm --cached` or `sops updatekeys` alone.
 
-**The commands** (each takes `--json`; a finding exits nonzero):
+**Encrypted, scanned, brokered.** hush encrypts nothing itself. `hush init --sops` writes a `.sops.yaml`, so
+[SOPS](https://github.com/getsops/sops) encrypts secret files with [age](https://github.com/FiloSottile/age)
+keys. It lists a second, break-glass recipient, and it creates the first age key when `age-keygen` is
+installed. `hush scan` runs its own offline scanner. It adds [gitleaks](https://github.com/gitleaks/gitleaks)
+when gitleaks is installed. With `--verify` it adds [trufflehog](https://github.com/trufflesecurity/trufflehog),
+which reports only keys that still work. `hush broker` returns a handle and an expiry time, never the value.
+
+**The commands** (each takes `--json`, and a finding exits nonzero):
 
 ```text
 hush scan [path] [--staged] [--history] [--verify] [--mcp-config]   # the scanning stack
@@ -132,7 +138,34 @@ pitfalls, real incidents (the golden tasks), the tool matrix and the open disput
 `bash scripts/memory-search.sh "<question>"`.
 
 **Isolation.** CI runs the acceptance test on a fresh runner. `node sandbox/run-in-sandbox.mjs --boot` runs it
-in an E2B microVM built from `sandbox/Dockerfile`; that is a billed call, so it only happens on that flag.
+in an E2B microVM built from `sandbox/Dockerfile`. That is a billed call, so it only happens on that flag.
+
+## Limits
+
+**What hush stops:**
+
+- A secret-shaped string in a Bash command or in a Write or Edit, before Claude Code runs it. The guard knows
+  the key formats of Anthropic, OpenAI, AWS, GitHub, Slack, Google and Stripe. It also catches JSON web
+  tokens, private key blocks and long random-looking tokens.
+- A literal secret written into `.mcp.json`. A `${VAR}` reference passes.
+- A commit or a CI run that carries a secret, once `hush init --scanner` adds the gitleaks pre-commit hook and
+  a CI workflow (gitleaks, plus trufflehog for keys that still work).
+- A raw value in its own output. Every tool returns a handle, a verdict or a redacted finding, and the run log
+  is redacted.
+
+**What hush cannot stop:**
+
+- A command you approve that prints a value, such as `printenv`. The guard reads what goes into a command, not
+  what comes out, so that value enters the agent's context.
+- A secret with no known format and little randomness, such as a short password.
+- A key that already reached a remote. A scan finds it, but only a rotation at the provider fixes it.
+- Missing values. hush has no secret store yet. `hush inject -- <cmd>` runs the command with the environment
+  it already has, and reports the order it would deliver secrets in: a file mount first, never a committed
+  env file. The values come from a manager you run, such as OpenBao or Vault.
+- Agents without the hook. The guard runs where the plugin's hook is installed, in Claude Code. Other agents
+  get the scanner, the MCP tools and the skills.
+- Decoys, when gitleaks is installed and a repository has no `.gitleaks.toml`. gitleaks then uses its default
+  rules, which can flag `password = "password"`. `hush init --scanner` adds hush's baseline.
 
 <!-- fleet:anatomy:start -->
 ## What it is made of
