@@ -9,7 +9,7 @@
     {
       "name": "hush",
       "source": "./",
-      "description": "Secrets that never reach the model: encrypted, scanned, brokered."
+      "description": "Keeps secrets from reaching the model: blocked at the hook, scanned, and encrypted with SOPS and age."
     }
   ]
 }

@@ -1,7 +1,7 @@
 # AGENTS.md — how to use hush (the secrets employee)
 
 > **hush** is the Energy fleet's secrets-management domain-expert employee. You are a coding agent
-> (Claude Code, the energy hub, a sibling employee like rocket/turbo/badge). This file is your guide
+> (Claude Code, the energy hub, a sibling employee like rocket or turbo). This file is your guide
 > to invoking hush correctly and to the one rule you must never break.
 >
 > **Tagline:** *Issued, never leaked. Rotated, then proven.* — Powered by Energy.
@@ -40,9 +40,9 @@ that returns handles · inject into processes via file-mount over env · K8s inj
 close the five agent-channel leaks · recommend the *portfolio*, never one tool.
 
 **REFUSES** (the boundary — hard):
-- **Auth / sign-in / sessions / OAuth user-login / `userId`-from-session → that's `badge`.** hush
-  *consumes* a machine identity; it never *owns* one. A secrets employee that grows an auth system is a
-  scope-creep liability. [brain: O-15]
+- **Sign-in and user identity are out of scope** (auth, sessions, OAuth user login, a `userId` from a
+  session). hush *consumes* a machine identity; it never *owns* one. A secrets employee that grows an auth
+  system is a scope-creep liability. [brain: O-15]
 - **Returning a raw secret value** to any agent surface — a leak by construction. [brain: O-09]
 - **Calling a leak "remediated" after `git rm --cached` / `sops updatekeys`-only / "removed in a later
   commit" / GCP "rotation enabled"** — these are *false-greens*; hush blocks the green until rotation is
@@ -110,8 +110,8 @@ When a task arrives, route it to the job; `src/dispatch/route.ts` does this prog
 
 ## NOT-list (refuse / hand off)
 
-- ❌ Authentication, sign-in, sessions, OAuth user-login, identity → **badge**.
-- ❌ Owning/minting a human or agent *identity* — hush consumes badge's machine identity, never issues one.
+- ❌ Sign-in and user identity are out of scope (authentication, sessions, OAuth user login).
+- ❌ Owning/minting a human or agent *identity* — hush consumes a machine identity, never issues one.
 - ❌ Product billing / payment rails → **penny**; earning loops → **helios**.
 - ❌ Deploy/CI of any target app → **rocket**; DB schema/RLS → **acorn**; web shell → **pixel**; API
   runtime → **turbo**.
@@ -123,8 +123,8 @@ When a task arrives, route it to the job; `src/dispatch/route.ts` does this prog
 
 - **To a coding agent (MCP/CLI handshake):** *"I'm hush, the secrets employee. I return handles, never
   values. Ask me to `scan` a repo, `advise` on a remediation, wire a scanner/SOPS setup, or `broker` a
-  short-TTL cred. I will refuse to hand you a raw secret or to call a leak fixed before it's rotated. Auth
-  is badge's job, not mine."*
+  short-TTL cred. I will refuse to hand you a raw secret or to call a leak fixed before it's rotated. Sign-in
+  and user identity are out of scope."*
 - **To a human (cockpit / `hush --help`):** *"hush keeps your secrets out of git, your logs, and your
   agents' context. I scan for leaks, tell you the real fix (rotate first — un-tracking is theater), and
   broker short-lived credentials so a leaked key is a non-event. I recommend a portfolio (SOPS+age in git,

@@ -3,7 +3,7 @@
 <!-- fleet:header:start -->
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE) [![Agent-native](https://img.shields.io/badge/agent--native-yes-2f5d8a?style=flat-square)](AGENTS.md) [![MCP server](https://img.shields.io/badge/MCP-server-1e3f60?style=flat-square)](#use-it-from-any-coding-agent) [![Skills](https://img.shields.io/badge/skills-5-2f6b4f?style=flat-square)](skills/)
 
-**Secrets that never reach the model: encrypted, scanned, brokered.**
+**Keeps secrets from reaching the model: blocked at the hook, scanned, and encrypted with SOPS and age.**
 
 Hush is an agent employee, a packaged specialist agent with its own skills, memory and tests. It owns one job: secrets. Coding agents use it through its skills, its MCP server and its command line. A scheduled job runs its evals and proposes fixes. A person makes every change.
 
@@ -111,7 +111,8 @@ one. It will not call a leak fixed after `git rm --cached` or `sops updatekeys` 
 [SOPS](https://github.com/getsops/sops) encrypts secret files with [age](https://github.com/FiloSottile/age)
 keys. It lists a second, break-glass recipient, and it creates the first age key when `age-keygen` is
 installed. `hush scan` runs its own offline scanner. It adds [gitleaks](https://github.com/gitleaks/gitleaks)
-when gitleaks is installed. With `--verify` it adds [trufflehog](https://github.com/trufflesecurity/trufflehog),
+when gitleaks is installed, with hush's baseline config if the repository has none, so decoys such as
+`password = "password"` pass. With `--verify` it adds [trufflehog](https://github.com/trufflesecurity/trufflehog),
 which reports only keys that still work. `hush broker` returns a handle and an expiry time, never the value.
 
 **The commands** (each takes `--json`, and a finding exits nonzero):
@@ -164,8 +165,6 @@ in an E2B microVM built from `sandbox/Dockerfile`. That is a billed call, so it 
   env file. The values come from a manager you run, such as OpenBao or Vault.
 - Agents without the hook. The guard runs where the plugin's hook is installed, in Claude Code. Other agents
   get the scanner, the MCP tools and the skills.
-- Decoys, when gitleaks is installed and a repository has no `.gitleaks.toml`. gitleaks then uses its default
-  rules, which can flag `password = "password"`. `hush init --scanner` adds hush's baseline.
 
 <!-- fleet:anatomy:start -->
 ## What it is made of

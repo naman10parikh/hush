@@ -1,8 +1,8 @@
 # hush
 
-> Secrets that never reach the model: encrypted, scanned, brokered. hush is the secrets-management employee that coding agents call through a CLI, an MCP server and five skills; it returns handles and verdicts, never raw secret values.
+> Keeps secrets from reaching the model: blocked at the hook, scanned, and encrypted with SOPS and age. hush is the secrets-management employee that coding agents call through a CLI, an MCP server and five skills; it returns handles and verdicts, never raw secret values.
 
-hush scans a repository for leaked secrets, gives the real fix (rotate first, scrub second), wires a scanner and SOPS+age setup, and brokers short-lived credential handles. It refuses the false-greens (`git rm --cached`, `sops updatekeys` alone, GCP "rotation enabled") and refuses to quote a single price as fact. Its judgment lives in `brain/`; the surfaces are thin. Boundary: auth is badge's job; hush consumes a machine identity and never owns one. Tagline: Issued, never leaked. Rotated, then proven. Powered by Energy.
+hush scans a repository for leaked secrets, gives the real fix (rotate first, scrub second), wires a scanner and SOPS+age setup, and brokers short-lived credential handles. It refuses the false-greens (`git rm --cached`, `sops updatekeys` alone, GCP "rotation enabled") and refuses to quote a single price as fact. Its judgment lives in `brain/`; the surfaces are thin. Boundary: sign-in and user identity are out of scope. hush consumes a machine identity and never owns one. Tagline: Issued, never leaked. Rotated, then proven. Powered by Energy.
 
 Run it from GitHub with no clone: `npx -y -p github:naman10parikh/hush hush --help` for the CLI and `npx -y -p github:naman10parikh/hush hush-mcp` for the MCP server (stdio). Paths below are relative to the repository root.
 
@@ -10,13 +10,13 @@ The capability ladder: `broker (handle, no value) > dynamic short-lived cred > r
 
 ## Start here
 
-- [AGENTS.md](AGENTS.md): what hush does, how to invoke every CLI and MCP tool, the 12-job router, the NOT-list (the badge boundary) and the hard handles-not-values rule.
-- [CLAUDE.md](CLAUDE.md): the Claude Code operating rules for this repository (rotate first, handles not values, portfolio not brand, the badge boundary); it imports AGENTS.md.
+- [AGENTS.md](AGENTS.md): what hush does, how to invoke every CLI and MCP tool, the 12-job router, the NOT-list (what is out of scope, including sign-in and user identity) and the hard handles-not-values rule.
+- [CLAUDE.md](CLAUDE.md): the Claude Code operating rules for this repository (rotate first, handles not values, portfolio not brand, sign-in out of scope); it imports AGENTS.md.
 - [README.md](README.md): what it is, the quick start, and how to install it in any coding agent.
 
 ## Identity
 
-- [identity/SOUL.md](identity/SOUL.md): who hush is, the secrets-expert persona (is, does, refuses), the auth-to-badge boundary and the capability ladder.
+- [identity/SOUL.md](identity/SOUL.md): who hush is, the secrets-expert persona (is, does, refuses), the sign-in and user-identity boundary and the capability ladder.
 - [identity/BRAND.md](identity/BRAND.md): the name's reason (the word is the product: keep the secret quiet), the tagline and design tokens.
 - [.well-known/agent.json](.well-known/agent.json): the A2A agent card (name, description, endpoint, capabilities `scan`, `doctor`, `advise`, `remediate`, `broker`, `tool`).
 
