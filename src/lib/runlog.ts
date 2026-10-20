@@ -73,5 +73,5 @@ export function appendRun(rec: RunRecord): void {
 
 export const LOG_FILE_PATH = LOG_PATH;
 
-/** The model hush runs under (CP123 D12/D14: always Opus 4.8, max). Recorded per run. */
-export const HUSH_MODEL = "claude-opus-4-8[1m]";
+/** The model a run is labelled with: ANTHROPIC_MODEL when set, else "default" (Claude Code's own). It records a run; it never chooses one. */
+export const HUSH_MODEL = process.env.ANTHROPIC_MODEL?.trim() || "default";

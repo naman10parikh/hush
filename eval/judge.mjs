@@ -16,9 +16,9 @@
  * @anthropic-ai/sdk dependency (PLAN §7 pins only `commander`; the L3 judge is
  * nightly/non-blocking and must not pull a heavy dep into the CI-blocking path).
  *
- * Model routing (CP123 D12/D14): EXPLICIT model `claude-opus-4-8`, max effort,
- * adaptive thinking — never a bare default. The model id is centralized so the
- * RSI workflow + any spawn name it explicitly.
+ * Model routing: the person names the judge model in HUSH_JUDGE_MODEL. The
+ * Messages API needs a model name and hush never picks one, because a fixed ID
+ * goes stale; with no name, L3 is skipped.
  */
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -28,8 +28,10 @@ import { advise } from "../dist/lib/false-green.js";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(HERE, "..");
 
-/** The judge model — explicit (CP123 D12/D14: always Opus 4.8, max). */
-export const JUDGE_MODEL = "claude-opus-4-8";
+/** The judge model, named by the person; empty when unset (L3 is then skipped). */
+export function judgeModel() {
+  return process.env.HUSH_JUDGE_MODEL?.trim() ?? "";
+}
 const ANTHROPIC_VERSION = "2023-06-01";
 const API_URL = "https://api.anthropic.com/v1/messages";
 
@@ -49,9 +51,9 @@ function apiKey() {
   return null;
 }
 
-/** True iff an Anthropic key is present (env or .env). L3 is skipped otherwise. */
+/** True iff an Anthropic key is present (env or .env) and HUSH_JUDGE_MODEL names a model. L3 is skipped otherwise. */
 export function judgeAvailable() {
-  return apiKey() !== null;
+  return apiKey() !== null && judgeModel() !== "";
 }
 
 /**
@@ -95,7 +97,7 @@ async function callJudge(systemPrompt, userPrompt) {
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      model: JUDGE_MODEL,
+      model: judgeModel(),
       max_tokens: 1024,
       thinking: { type: "adaptive" },
       output_config: { effort: "max" },

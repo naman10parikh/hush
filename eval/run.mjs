@@ -20,8 +20,8 @@
  * No self-grading: the model does not grade its own answer. L2 is graded by code
  * (the assertion checker); L3 by a SEPARATE judge model with a binary rubric.
  *
- * Model routing (CP123 D12/D14): the L3 judge passes an EXPLICIT model
- * (claude-opus-4-8[1m]) — never a bare default.
+ * Model routing: the L3 judge passes the model named in HUSH_JUDGE_MODEL, never a
+ * default of its own.
  */
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -334,7 +334,7 @@ async function main() {
       if (!judgeAvailable()) {
         l3Skip++;
         console.log(
-          `${ANSI.yellow("SKIP")} ${task.id} (L3) — no ANTHROPIC_API_KEY (judge unavailable; non-blocking)`,
+          `${ANSI.yellow("SKIP")} ${task.id} (L3) — no ANTHROPIC_API_KEY or no HUSH_JUDGE_MODEL (judge unavailable; non-blocking)`,
         );
         continue;
       }

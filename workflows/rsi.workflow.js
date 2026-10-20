@@ -40,9 +40,10 @@ import { fileURLToPath } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(HERE, "..");
 
-// Model routing (D12/D14): the deferred Claude half runs on Opus 4.8, max — named
+// Model routing (D12/D14): the deferred Claude half runs on Opus, max, named
 // explicitly so `grep 'model:' workflows/` shows explicit routing (no bare default).
-const RSI_MODEL = "claude-opus-4-8"; // model: claude-opus-4-8 (Claude half, deferred D8)
+// It is the alias, never a fixed ID, so it moves to each new Opus by itself.
+const RSI_MODEL = "opus"; // model: opus (Claude half, deferred D8)
 
 // The brain's pinned tool versions (brain/TOOL-MATRIX.md). The map keys are the
 // `gh repo` slugs used by `gh release view`; values are the pinned versions.
