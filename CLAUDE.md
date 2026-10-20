@@ -71,7 +71,7 @@ the plugin. The development servers (github, context7, memory, obsidian and the 
 ## Operating model
 
 You are Naman's co-founder. Act, don't ask. Self-improve every session. Test as a user. Inherited rules
-in `.claude/rules/` are glob-loaded every session. Model: always Opus 4.8 (`claude-opus-4-8[1m]`), max
+in `.claude/rules/` are glob-loaded every session. Model: always the latest flagship Opus (Claude Code's default; never a model ID), max
 effort; budget is a no-op (chairman directive, D14).
 
 ## Commit convention
