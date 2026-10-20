@@ -1,6 +1,6 @@
 ---
 name: sops-age-gitops
-description: Encrypt secrets at-rest in git with SOPS+age for GitOps (Flux/Argo) — as a COMPLEMENT to a runtime broker, never a replacement. Always list a break-glass second recipient; distinguish sops rotate from sops updatekeys; pin SOPS and test-decrypt per backend after a bump.
+description: "Encrypt secrets at-rest in git with SOPS+age for GitOps (Flux/Argo) — as a COMPLEMENT to a runtime broker, never a replacement. Always list a break-glass second recipient; distinguish sops rotate from sops updatekeys; pin SOPS and test-decrypt per backend after a bump. Use when asked to encrypt secrets in git, set up SOPS, do GitOps secrets (Flux/Argo), handle a teammate leaving a SOPS repo, or debug \"SOPS can't decrypt after a version bump\"."
 trigger: When asked to encrypt secrets in git, set up SOPS, do GitOps secrets (Flux/Argo), handle a teammate leaving a SOPS repo, or debug "SOPS can't decrypt after a version bump".
 ---
 

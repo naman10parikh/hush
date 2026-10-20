@@ -1,6 +1,6 @@
 ---
 name: secret-leak-remediation
-description: Remediate a committed/leaked secret the RIGHT way — rotate first, scrub second. Refuses the false-greens (git rm --cached, sops updatekeys-only, "removed in a later commit") that turn CI green while the key stays live.
+description: "Remediate a committed/leaked secret the RIGHT way — rotate first, scrub second. Refuses the false-greens (git rm --cached, sops updatekeys-only, \"removed in a later commit\") that turn CI green while the key stays live. Use when a key/secret was committed, found in git history, pushed to a remote, or CI is red on a leaked secret — and someone is about to \"fix\" it by deleting the file or rewriting history."
 trigger: When a key/secret was committed, found in git history, pushed to a remote, or CI is red on a leaked secret — and someone is about to "fix" it by deleting the file or rewriting history.
 ---
 

@@ -8,8 +8,8 @@ sources:
   - "~/energy/chairman/CHAIRMAN-CHECKLIST.md (§SECURITY)"
   - "~/energy/.claude/rules/browser-agent-security.md"
   - "~/energy/.github/workflows/secret-scanner.yml"
-  - "~/hush/.env.example"
-  - "~/hush/AGENTS.md"
+  - ".env.example"
+  - "AGENTS.md"
 summary: "Read-only internal-corpus digest: the LIVE tracked-.env leak, the secret-scanner CI logic, and the browser-agent-security rules — quoted verbatim for hush's domain memory."
 ---
 
@@ -93,14 +93,14 @@ These are the fleet's existing secret-adjacent doctrine; hush should align, not 
 
 ## 4. hush wiki schema (where research routes)
 
-Source: `~/hush/AGENTS.md`. Wiki lives under `brain/wiki/` (sources/entities/concepts/
+Source: `AGENTS.md`. Wiki lives under `brain/wiki/` (sources/entities/concepts/
 syntheses). Raw immutable sources under `brain/research/raw/` (this file). hush domain = "personal" stub
 (forged skeleton) — the real domain is **Secrets management**. Frontmatter convention: title/type/created/
 updated/tags/sources/related/summary. Wikilinks `[[Page]]`. `wikimem lint` flags orphans.
 
 ## 5. hush's own .env.example (inherited from energy — a teaching artifact)
 
-Source: `~/hush/.env.example` — it is currently a **verbatim copy of energy's** (Anthropic,
+Source: `.env.example` — it is currently a **verbatim copy of energy's** (Anthropic,
 E2B, Clerk, Stripe, Google, Ticketmaster, Composio, Supabase, GitHub PAT, Twilio, WhatsApp, Cronofy,
 Browserbase, Firecrawl, Spark identity). This is itself a hush use-case: a domain-secrets employee should
 *generate* per-repo `.env.example` from a schema, not inherit a stale superset. Note the file uses

@@ -48,7 +48,7 @@ grep -qE '(^|\n)\.env' .gitignore && echo "ignored" || echo "NOT IGNORED — vul
 **AVOID:** add `.env*` to `.gitignore` AND keep `!.env.example`. Ship a `.gitignore` template that does
 this by default. [src: ecosystem-00 §1; ecosystem-02 §"what hush should ship"]
 
-**⚠ DOGFOOD — true of hush's OWN repo right now:** `~/hush/.gitignore` (verified 2026-06-16)
+**⚠ DOGFOOD — true of hush's OWN repo right now:** `.gitignore` (verified 2026-06-16)
 contains NO `.env*` line. The secrets employee currently has the very hole that caused the fleet's
 flagship leak. Fixing hush's own `.gitignore` is JOB 1's first dogfood task. [verified against repo]
 
@@ -68,7 +68,7 @@ blanks" for keys the repo doesn't even need — and some of those filled values 
 consumes, each a placeholder + a one-line comment. [src: ecosystem-00 §2, §5] (tested by
 [[BATTLE-TESTED-SCENARIOS]] S-14)
 
-**⚠ DOGFOOD — true of hush's OWN repo right now:** `~/hush/.env.example` (verified
+**⚠ DOGFOOD — true of hush's OWN repo right now:** `.env.example` (verified
 2026-06-16) literally begins `# Energy Platform — Environment Variables` and carries Clerk, Stripe,
 E2B, Ticketmaster, etc. — most of which a secrets employee does not need. *Correct part:* it uses
 placeholders (`sk-ant-...`, `e2b_...`), zero real values. So the value-hygiene is right; the *schema*
@@ -346,7 +346,7 @@ the value; the actual use happens via a broker (`op run --`, `infisical run --`)
 cred so the value never enters the model's context. Scan the MCP config file specifically; never write a
 real secret into it. [src: ecosystem-04 §1, §2, §6] (tested by [[BATTLE-TESTED-SCENARIOS]] S-08)
 
-**✅ DOGFOOD — hush gets this one RIGHT:** `~/hush/.mcp.json` (verified 2026-06-16) references
+**✅ DOGFOOD — hush gets this one RIGHT:** `.mcp.json` (verified 2026-06-16) references
 the GitHub token as `${GITHUB_PERSONAL_ACCESS_TOKEN}`, not a pasted value. That is the correct pattern —
 the config carries a *reference*, the value comes from the environment at launch. [verified against repo]
 

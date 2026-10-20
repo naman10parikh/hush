@@ -1,6 +1,6 @@
 ---
 name: scanner-stack-setup
-description: Set up the LAYERED secret-scanning stack — gitleaks (prevent + catch) AND trufflehog (verify), with a baseline/entropy allowlist so false positives don't kill the scanner, plus a .mcp.json + base64 scan. They are not alternatives; run both.
+description: "Set up the LAYERED secret-scanning stack — gitleaks (prevent + catch) AND trufflehog (verify), with a baseline/entropy allowlist so false positives don't kill the scanner, plus a .mcp.json + base64 scan. They are not alternatives; run both. Use when setting up secret scanning, a pre-commit hook, a CI secret check, or fixing a scanner that drowns the team in false positives on test fixtures / docs."
 trigger: When setting up secret scanning, a pre-commit hook, a CI secret check, or fixing a scanner that drowns the team in false positives on test fixtures / docs.
 ---
 

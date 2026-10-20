@@ -1,0 +1,10 @@
+# The image context for sandbox/Dockerfile (local docker build and the E2B template).
+# Never send a secret or local state into an image (a local .env may hold real keys).
+.env*
+!.env.example
+.git
+node_modules
+dist
+logs
+test-results
+brain-wiki

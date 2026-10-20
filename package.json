@@ -4,7 +4,8 @@
   "description": "The fleet's secrets-management employee — issued, never leaked; rotated, then proven. Returns handles, never values.",
   "type": "module",
   "bin": {
-    "hush": "./bin/hush"
+    "hush": "./bin/hush",
+    "hush-mcp": "./bin/hush-mcp"
   },
   "main": "./dist/cli/index.js",
   "types": "./dist/cli/index.d.ts",
@@ -35,9 +36,10 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
+    "prepare": "tsc",
     "test": "vitest run",
     "eval": "node eval/run.mjs",
-    "darwin-check": "node ~/darwin/bin/darwin-check.mjs",
+    "darwin-check": "node $HOME/darwin/bin/darwin-check.mjs",
     "prepublishOnly": "pnpm build && pnpm test"
   },
   "dependencies": {
@@ -46,6 +48,7 @@
   "devDependencies": {
     "@playwright/test": "^1.49.0",
     "@types/node": "^22.10.0",
+    "e2b": "^2.56.0",
     "typescript": "^5.7.0",
     "vitest": "^2.1.0"
   }

@@ -1,6 +1,6 @@
 ---
 name: dynamic-secret-provisioning
-description: Provision short-lived dynamic credentials (OpenBao/Vault database/creds/<role>) instead of rotating static ones — with mandatory rotate-root — and rotate live-connection secrets via ISSUE→DEPLOY→VERIFY→REVOKE (never overwrite-in-place; GCP rotation is notify-only).
+description: "Provision short-lived dynamic credentials (OpenBao/Vault database/creds/<role>) instead of rotating static ones — with mandatory rotate-root — and rotate live-connection secrets via ISSUE→DEPLOY→VERIFY→REVOKE (never overwrite-in-place; GCP rotation is notify-only). Use when asked for a short-lived DB credential, a dynamic secret, rotation without downtime, \"enable GCP rotation\", or fixing a Vault 2.0.2 container that won't start."
 trigger: When asked for a short-lived DB credential, a dynamic secret, rotation without downtime, "enable GCP rotation", or fixing a Vault 2.0.2 container that won't start.
 ---
 

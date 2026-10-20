@@ -38,6 +38,9 @@ jobs:
           cache: pnpm
       - name: Run deterministic RSI engine ($0, tokenless)
         if: steps.rt.outputs.armed == 'true'
+        env:
+          # gh release view needs a token on the runner; without it every upstream check was "unreachable".
+          GH_TOKEN: ${{ github.token }}
         run: |
           pnpm install --frozen-lockfile || pnpm install
           # Build first: the RSI engine's eval step (`pnpm eval` → eval/run.mjs)
@@ -48,6 +51,13 @@ jobs:
           # The deterministic engine: detects tool-version drift, re-verifies brain
           # pins, re-runs the eval pyramid, proposes (does NOT auto-commit). $0.
           node workflows/rsi.workflow.js
+      - name: Keep the proposal for review (the runner is thrown away)
+        if: always() && steps.rt.outputs.armed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rsi-proposal
+          path: workflows/proposals/
+          if-no-files-found: ignore
       - name: Engine guard (not built yet)
         if: steps.rt.outputs.armed == 'false'
         run: |

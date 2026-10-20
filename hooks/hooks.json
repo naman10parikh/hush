@@ -1,0 +1,16 @@
+{
+  "description": "hush secret-scan-gate: blocks a secret-shaped string in a command or a file write, and a literal secret written into .mcp.json.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/.claude/hooks/secret-scan-gate.js\""
+          }
+        ]
+      }
+    ]
+  }
+}

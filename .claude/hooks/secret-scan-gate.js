@@ -228,7 +228,10 @@ export async function main() {
 // isn't universal yet, so compare the resolved entry URL to this module's URL.
 import { argv } from "node:process";
 import { pathToFileURL } from "node:url";
-const isMain = import.meta.url === pathToFileURL(argv[1] ?? "").href;
+import { realpathSync } from "node:fs";
+// Resolve symlinks first: Node reports the real path in import.meta.url, so a hook started through a
+// symlinked directory would otherwise skip main() and allow everything.
+const isMain = argv[1] !== undefined && import.meta.url === pathToFileURL(realpathSync(argv[1])).href;
 if (isMain) {
   main().catch((e) => {
     // Fail OPEN on an internal hook error (never wedge the agent on a hook bug),

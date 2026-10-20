@@ -1,96 +1,93 @@
 # hush
 
-> The Energy fleet's **secrets-management** domain-expert employee. hush is a tool-employee, not a
-> product: coding agents call it via **CLI + MCP** to scan a repo for leaked secrets, get the *real*
-> (rotate-first, scrub-second) remediation, wire a scanner/SOPS+age setup, and broker short-TTL
-> credential handles — always returning **handles, never raw values** (the modal 2026 agent leak). It
-> refuses the false-greens (`git rm --cached`, `sops updatekeys`-only, GCP "rotation enabled") and refuses
-> to quote a single price. The asset is its `brain/` (judgment); the surfaces are thin. Boundary: not auth
-> (that's badge — hush *consumes* a machine identity, never owns one). **Tagline:** *Issued, never leaked.
-> Rotated, then proven.* Powered by Energy.
+> Secrets that never reach the model: encrypted, scanned, brokered. hush is the secrets-management employee that coding agents call through a CLI, an MCP server and five skills; it returns handles and verdicts, never raw secret values.
 
-This is the agent-readable map of hush's docs and surfaces. Read `AGENTS.md` first for how to invoke every
-tool and the one rule you must never break (handles-not-values). Paths are repo-relative.
+hush scans a repository for leaked secrets, gives the real fix (rotate first, scrub second), wires a scanner and SOPS+age setup, and brokers short-lived credential handles. It refuses the false-greens (`git rm --cached`, `sops updatekeys` alone, GCP "rotation enabled") and refuses to quote a single price as fact. Its judgment lives in `brain/`; the surfaces are thin. Boundary: auth is badge's job; hush consumes a machine identity and never owns one. Tagline: Issued, never leaked. Rotated, then proven. Powered by Energy.
 
-## The capability ladder (the one-liner to memorize)
+Run it from GitHub with no clone: `npx -y -p github:naman10parikh/hush hush --help` for the CLI and `npx -y -p github:naman10parikh/hush hush-mcp` for the MCP server (stdio). Paths below are relative to the repository root.
 
-`broker (handle, no value) > dynamic short-lived cred > rotated static secret > raw static secret (last resort)`
+The capability ladder: `broker (handle, no value) > dynamic short-lived cred > rotated static secret > raw static secret (last resort)`.
 
 ## Start here
 
-- [AGENTS.md](AGENTS.md): What hush does, how to invoke every CLI + MCP tool, the 12-JTBD router, the
-  NOT-list (badge boundary), and the HARD handles-not-values rule.
-- [CLAUDE.md](CLAUDE.md): the operating spine — rotate-first, handles-not-values, portfolio-not-brand,
-  the badge boundary.
-- [README.md](README.md): the human-facing one-paragraph intro + the CLI quick-reference.
+- [AGENTS.md](AGENTS.md): what hush does, how to invoke every CLI and MCP tool, the 12-job router, the NOT-list (the badge boundary) and the hard handles-not-values rule.
+- [CLAUDE.md](CLAUDE.md): the Claude Code operating rules for this repository (rotate first, handles not values, portfolio not brand, the badge boundary); it imports AGENTS.md.
+- [README.md](README.md): what it is, the quick start, and how to install it in any coding agent.
 
 ## Identity
 
-- [identity/SOUL.md](identity/SOUL.md): who hush is — the secrets-expert persona (IS / DOES / REFUSES + the
-  auth→badge boundary + the capability ladder).
-- [identity/BRAND.md](identity/BRAND.md): name rationale (the word *is* the product — keep the secret
-  quiet), tagline, design tokens.
-- [.well-known/agent.json](.well-known/agent.json): the **A2A agent card** — name, description, endpoint,
-  capabilities (`scan`, `doctor`, `advise`, `remediate`, `broker`, `tool`).
+- [identity/SOUL.md](identity/SOUL.md): who hush is, the secrets-expert persona (is, does, refuses), the auth-to-badge boundary and the capability ladder.
+- [identity/BRAND.md](identity/BRAND.md): the name's reason (the word is the product: keep the secret quiet), the tagline and design tokens.
+- [.well-known/agent.json](.well-known/agent.json): the A2A agent card (name, description, endpoint, capabilities `scan`, `doctor`, `advise`, `remediate`, `broker`, `tool`).
 
-## CLI commands (`hush` — every command takes `--json`; exit nonzero on any finding)
+## CLI (`hush`; every command takes `--json`; exit nonzero on any finding)
 
-- `hush scan [path] [--staged] [--history] [--verify] [--mcp-config] [--json]` — the scanning stack; **exit 1 on any finding** (the acceptance bar).
-- `hush doctor [--json]` — report this repo's secret-manager wiring (gitignore_ok, mcp_refs_ok, score, …).
-- `hush advise "<situation>" [--json]` — verdict + doctrine; flags false-greens.
-- `hush remediate <finding|file> [--json]` — ordered rotate-first plan (consent-gated scrub).
-- `hush rotate-plan <secret-ref> [--live-connections] [--json]` — ISSUE→DEPLOY→VERIFY→REVOKE plan.
-- `hush init [--scanner|--sops|--gitignore|--env-example]` — scaffold what hush ships.
-- `hush env-example [path] [--write]` — generate `.env.example` from the real var schema.
-- `hush broker <name> [--ttl] [--wrap] [--json]` — return a handle, never a value.
-- `hush inject -- <cmd>` — run a child with secrets via file-mount, never a committed `.env`.
-- `hush tool <job>` — recommend the portfolio/layer (never a single price).
-- `hush runs [--view]` — show the redacted observability log.
-- `hush --help | --version`
+- [src/cli/index.ts](src/cli/index.ts): the CLI entry. Commands:
+  - `hush scan [path] [--staged] [--history] [--verify] [--mcp-config] [--json]`: the scanning stack; exit 1 on any finding (the acceptance bar).
+  - `hush doctor [--json]`: this repository's secret-manager wiring (gitignore_ok, mcp_refs_ok, score and more).
+  - `hush advise "<situation>" [--json]`: a verdict plus doctrine; flags false-greens.
+  - `hush remediate <finding|file> [--json]`: an ordered rotate-first plan, with the scrub gated on consent.
+  - `hush rotate-plan <secret-ref> [--live-connections] [--json]`: the ISSUE, DEPLOY, VERIFY, REVOKE plan.
+  - `hush init [--scanner|--sops|--gitignore|--env-example]`: scaffold what hush ships.
+  - `hush env-example [path] [--write]`: generate `.env.example` from the real variable schema.
+  - `hush broker <name> [--ttl] [--wrap] [--json]`: return a handle, never a value.
+  - `hush inject -- <cmd>`: run a child process with secrets through a file mount, never a committed `.env`.
+  - `hush tool <job>`: recommend the portfolio or layer for a job (never a single price).
+  - `hush runs [--view]`: show the redacted run log.
+  - `hush --help | --version`
 
-## MCP server (`hush`, stdio — `node dist/mcp/server.js`)
+## MCP server (`hush-mcp`, stdio)
 
-Wired in `.mcp.json` (env-refs only, no live keys). **Every tool returns a handle/reference or a verdict —
-no `value` field, ever (O-09).** `tools/list` returns:
+- [src/mcp/tools.ts](src/mcp/tools.ts): the 7 tools. Every tool returns a handle, a reference or a verdict, never a `value` field (O-09):
+  - `hush_scan`: { findings: [{ rule, file, redacted_snippet }], exitCode }
+  - `hush_doctor`: { gitignore_ok, env_example_schema_only, mcp_refs_ok, scanners_present, sops_breakglass, score }
+  - `hush_advise`: { verdict, doctrine, false_green, brain_refs }
+  - `hush_remediate`: { ordered_steps, rotate_first, consent_required_for_scrub }
+  - `hush_rotate_plan`: { pattern: "ISSUE→DEPLOY→VERIFY→REVOKE", alternating_users }
+  - `hush_broker`: { handle: "hush://store/<name>", expiresAt } (no `value`)
+  - `hush_tool`: { default, alts, when_alt, billing_note }
+- [src/mcp/resources.ts](src/mcp/resources.ts): `hush://brain/*`, the 6 brain files as read-only resources.
+- [.mcp.json](.mcp.json): the config any MCP client can copy; it starts the server from GitHub. The development config is `.mcp.dev.json`.
 
-- `hush_scan` — { findings: [{ rule, file, redacted_snippet }], exitCode }
-- `hush_doctor` — { gitignore_ok, env_example_schema_only, mcp_refs_ok, scanners_present, sops_breakglass, score }
-- `hush_advise` — { verdict, doctrine, false_green, brain_refs }
-- `hush_remediate` — { ordered_steps, rotate_first, consent_required_for_scrub }
-- `hush_rotate_plan` — { pattern: "ISSUE→DEPLOY→VERIFY→REVOKE", alternating_users }
-- `hush_broker` — { handle: "hush://store/<name>", expiresAt } (no `value`)
-- `hush_tool` — { default, alts, when_alt, billing_note }
-- Resources: `hush://brain/*` — the 6 brain files as readable MCP resources.
+## The brain (what hush knows)
 
-## The brain (the judgment — what hush actually knows)
-
-- [brain/EXPERTISE-MAP.md](brain/EXPERTISE-MAP.md): the 12-JTBD decision spine hush runs on every task.
-- [brain/OPINIONS.md](brain/OPINIONS.md): the defensible taste stances (always X / never Y, because Z) — the anti-slop layer.
-- [brain/KNOWN-PITFALLS.md](brain/KNOWN-PITFALLS.md): version-pinned gotchas, each with DETECT + AVOID.
-- [brain/BATTLE-TESTED-SCENARIOS.md](brain/BATTLE-TESTED-SCENARIOS.md): real, named, dated secrets incidents + their resolution (the golden-task source).
-- [brain/TOOL-MATRIX.md](brain/TOOL-MATRIX.md): default vs alternative tool per job + the watchlist hush keeps current.
-- [brain/GAPS-AND-DISPUTES.md](brain/GAPS-AND-DISPUTES.md): where the field genuinely disagrees + what hush flags rather than bluffs.
+- [brain/EXPERTISE-MAP.md](brain/EXPERTISE-MAP.md): the 12-job decision spine hush runs on every task.
+- [brain/OPINIONS.md](brain/OPINIONS.md): the stances (always X, never Y, because Z).
+- [brain/KNOWN-PITFALLS.md](brain/KNOWN-PITFALLS.md): version-pinned gotchas, each with how to detect and avoid it.
+- [brain/BATTLE-TESTED-SCENARIOS.md](brain/BATTLE-TESTED-SCENARIOS.md): real, named, dated secrets incidents and their resolution (the golden-task source).
+- [brain/TOOL-MATRIX.md](brain/TOOL-MATRIX.md): the default and alternative tool per job, and the watchlist hush keeps current.
+- [brain/GAPS-AND-DISPUTES.md](brain/GAPS-AND-DISPUTES.md): where the field disagrees, and what hush flags rather than bluffs.
+- Query it: `bash scripts/memory-search.sh "<query>"` (BM25 over `brain/`).
 
 ## Skills
 
-- [skills/secret-leak-remediation/SKILL.md](skills/secret-leak-remediation/SKILL.md): a key was committed — rotate-first, scrub-second; the three false-greens (O-04 + P-06 + S-01/S-02).
-- [skills/scanner-stack-setup/SKILL.md](skills/scanner-stack-setup/SKILL.md): set up secret scanning / pre-commit / CI — gitleaks protect+detect + trufflehog --only-verified + baseline (O-03 + S-12 + P-03/P-05).
-- [skills/sops-age-gitops/SKILL.md](skills/sops-age-gitops/SKILL.md): encrypt secrets in git — SOPS+age complement, break-glass 2nd recipient, rotate vs updatekeys (O-07 + S-04/S-05 + P-09/P-10).
-- [skills/agent-secret-delivery/SKILL.md](skills/agent-secret-delivery/SKILL.md): give an agent/CI a secret — scoped machine identity, handles-not-values, file-mount > env (O-08/O-09/O-10 + S-06/S-08 + P-11/P-16/P-17).
-- [skills/dynamic-secret-provisioning/SKILL.md](skills/dynamic-secret-provisioning/SKILL.md): short-lived DB credential — database/creds/<role> + mandatory rotate-root, ISSUE→DEPLOY→VERIFY→REVOKE (O-05/O-06 + S-07/S-09/S-10 + P-07/P-08/P-13).
+- [skills/secret-leak-remediation/SKILL.md](skills/secret-leak-remediation/SKILL.md): a key was committed; rotate first, scrub second; the three false-greens (O-04, P-06, S-01, S-02).
+- [skills/scanner-stack-setup/SKILL.md](skills/scanner-stack-setup/SKILL.md): set up secret scanning, a pre-commit hook or a CI check with gitleaks, trufflehog `--only-verified` and a baseline (O-03, S-12, P-03, P-05).
+- [skills/sops-age-gitops/SKILL.md](skills/sops-age-gitops/SKILL.md): encrypt secrets in git with SOPS+age as a complement, with a break-glass second recipient; rotate versus updatekeys (O-07, S-04, S-05, P-09, P-10).
+- [skills/agent-secret-delivery/SKILL.md](skills/agent-secret-delivery/SKILL.md): give an agent or CI a secret through a scoped machine identity, handles not values, a file mount over env (O-08, O-09, O-10, S-06, S-08, P-11, P-16, P-17).
+- [skills/dynamic-secret-provisioning/SKILL.md](skills/dynamic-secret-provisioning/SKILL.md): a short-lived database credential with mandatory rotate-root; ISSUE, DEPLOY, VERIFY, REVOKE (O-05, O-06, S-07, S-09, S-10, P-07, P-08, P-13).
 
-## Sub-agents (fresh-context personas, callable via `Agent`)
+## Sub-agents (`.claude/agents/`)
 
-- [.claude/agents/hush-remediation-planner.md](.claude/agents/hush-remediation-planner.md): plans rotate-first remediation for a found leak; **refuses scrub-without-rotate**.
-- [.claude/agents/hush-tool-selector.md](.claude/agents/hush-tool-selector.md): recommends the portfolio/layer per job; **refuses to quote a single price** (G-01).
+- [hush-remediation-planner](.claude/agents/hush-remediation-planner.md): plans rotate-first remediation for a found leak; refuses a scrub without a rotation.
+- [hush-tool-selector](.claude/agents/hush-tool-selector.md): recommends the portfolio or layer per job; refuses to quote a single price (G-01).
 
-## Evals & acceptance
+## Evals, acceptance and self-improvement
 
-- [PLAN.md](PLAN.md) §5: THE acceptance test — `hush scan` flags a planted key (nonzero) + `hush doctor`
-  reports wiring; green ×3 in CI, $0 and offline.
-- [eval/](eval): the Hamel L1/L2/L3 golden-task pyramid (no self-grading).
+- [eval/run.mjs](eval/run.mjs): the golden-task pyramid (L1 structural, L2 binary golden tasks, L3 calibrated judge; no self-grading).
+- [sandbox/run-acceptance.sh](sandbox/run-acceptance.sh): the acceptance test: `hush scan` flags a planted key (nonzero exit) and `hush doctor` reports the wiring, three times, offline.
+- [workflows/rsi.workflow.js](workflows/rsi.workflow.js): the nightly, tokenless loop; it checks upstream tool versions and brain pins, reruns the evals and writes a proposal to `workflows/proposals/`; it never commits.
+- [dsip.json](dsip.json): the self-improvement contract (eval-gated, no self-grading, git snapback).
 
-## Plugin
+## Install surfaces
 
-- [.claude-plugin/manifest.json](.claude-plugin/manifest.json): the installable Claude Code plugin —
-  bundles the CLI + the MCP server + the 5 skills + the secret-scan-gate hook + the 2 sub-agents.
+- [.claude-plugin/plugin.json](.claude-plugin/plugin.json): the Claude Code plugin (skills, sub-agents, the secret-scan-gate hook, the MCP server); install with `/plugin marketplace add naman10parikh/hush`.
+- [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json): the one-plugin marketplace.
+- [hooks/hooks.json](hooks/hooks.json): the plugin's hook, the secret-scan-gate on Write, Edit and Bash.
+- [gemini-extension.json](gemini-extension.json): the Gemini CLI extension.
+
+## Optional
+
+- [SECURITY.md](SECURITY.md): how to report a vulnerability.
+- [CONTRIBUTING.md](CONTRIBUTING.md): how to contribute.
+- [LICENSE](LICENSE): MIT.

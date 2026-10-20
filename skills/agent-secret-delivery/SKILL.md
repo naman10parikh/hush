@@ -1,6 +1,6 @@
 ---
 name: agent-secret-delivery
-description: Give an agent / CI a secret WITHOUT leaking it — scoped machine identity (never a human token), return handles not values, inject via file-mount over env, and close the five agent-channel leaks (context, logs, prompt-injection, errors, MCP config).
+description: "Give an agent / CI a secret WITHOUT leaking it — scoped machine identity (never a human token), return handles not values, inject via file-mount over env, and close the five agent-channel leaks (context, logs, prompt-injection, errors, MCP config). Use when giving an agent or CI a secret, designing a \"secrets MCP\", doing secret-zero / machine identity, or asked to return a key to an agent so it can use it."
 trigger: When giving an agent or CI a secret, designing a "secrets MCP", doing secret-zero / machine identity, or asked to return a key to an agent so it can use it.
 ---
 

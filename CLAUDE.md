@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # hush — Agent-Native Harness (Secrets Management)
 
 > Forged from Energy via harness-forge (CP103). One repo = one recursively self-improving
@@ -57,6 +59,14 @@ account, no network). Detail: `PLAN.md` §5.
 
 `.gitignore` excludes `.env*` and keeps `!.env.example`; `.env.example` is *generated* from hush's real
 schema (not a stale copy); `.mcp.json` uses `${VAR}` refs, never a literal secret (`P-01`/`P-02`/`P-16`).
+
+## MCP config
+
+The root `.mcp.json` holds only hush's own server, started from GitHub
+(`npx -y -p github:naman10parikh/hush hush-mcp`), so it is safe for anyone who opens this repository or installs
+the plugin. The development servers (github, context7, memory, obsidian and the local build at
+`dist/mcp/server.js`) live in `.mcp.dev.json`, with `${VAR}` references only; load them with
+`claude --mcp-config .mcp.dev.json`.
 
 ## Operating model
 

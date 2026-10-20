@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+// hush-mcp: the secrets employee's MCP server (stdio).
+// Thin launcher: the real server is the compiled ESM at dist/mcp/server.js,
+// which starts on import. `pnpm build` (or npm's prepare on a git install) compiles it.
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { dirname, join } from "node:path";
+import { existsSync } from "node:fs";
+
+const here = dirname(fileURLToPath(import.meta.url));
+const entry = join(here, "..", "dist", "mcp", "server.js");
+
+if (!existsSync(entry)) {
+  process.stderr.write("[hush-mcp] dist/mcp/server.js not found; run `pnpm build` first.\n");
+  process.exit(127);
+}
+
+await import(pathToFileURL(entry).href);

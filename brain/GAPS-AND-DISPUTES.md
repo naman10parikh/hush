@@ -214,7 +214,7 @@ schema — the first dogfood of JOB 1 and S-14. Listed here so the gap is tracke
 **Finding:** the synthesis brief specifies *"Two researchers have written `ecosystem-*.md` and
 `field-*.md`."* As of synthesis (2026-06-16), `brain/research/raw/` contains **only** the seven
 `ecosystem-0X-*.md` files (00–06). There are **zero `field-*.md` files** — `ls field-*.md` returns no
-matches. [verified: `ls ~/hush/brain/research/raw/`]
+matches. [verified: `ls brain/research/raw/`]
 
 **Impact assessment (honest):**
 - The ecosystem corpus is **unusually strong** and already absorbed much of what a "field" track would

@@ -54,6 +54,9 @@ close the five agent-channel leaks · recommend the *portfolio*, never one tool.
 
 ## Tool list — CLI (`hush`)
 
+Run it without cloning: `npx -y -p github:naman10parikh/hush hush <command>` (npm builds `dist/` through the
+`prepare` script on a git install). Inside a clone: `pnpm install && pnpm build`, then `./bin/hush <command>`.
+
 Every command takes `--json` for machine-readable output. Exit code: `0` on success, **nonzero on any
 finding or error** (the acceptance bar). Run `hush --help` / `hush --version`.
 
@@ -71,9 +74,10 @@ finding or error** (the acceptance bar). Run `hush --help` / `hush --version`.
 | `hush tool <job>` | Recommend the portfolio/layer for a job (OpenBao default; SOPS+age for git). **Never a single price.** | 12 |
 | `hush runs [--view]` | Show the `logs/runs.jsonl` observability log (redacted). | — |
 
-## Tool list — MCP server (`hush`, stdio — `node dist/mcp/server.js`)
+## Tool list — MCP server (`hush-mcp`, stdio)
 
-Wired in `.mcp.json` (env-refs only, no live keys). **Every tool returns a handle/reference or a verdict
+Start it with `npx -y -p github:naman10parikh/hush hush-mcp`; the root `.mcp.json` wires exactly that, and
+`.mcp.dev.json` runs the local build (`node dist/mcp/server.js`). **Every tool returns a handle/reference or a verdict
 — no `value` field, ever.** `tools/list` returns:
 
 - `hush_scan({ path, staged?, history?, verify?, mcpConfig? })` → `{ findings:[{rule, file, redacted_snippet}], exitCode }`

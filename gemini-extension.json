@@ -1,0 +1,17 @@
+{
+  "name": "hush",
+  "version": "0.1.0",
+  "description": "Secrets that never reach the model: encrypted, scanned, brokered.",
+  "contextFileName": "GEMINI.md",
+  "mcpServers": {
+    "hush": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "-p",
+        "github:naman10parikh/hush",
+        "hush-mcp"
+      ]
+    }
+  }
+}

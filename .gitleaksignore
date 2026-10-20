@@ -1,0 +1,3 @@
+# A fake Stripe-shaped test fixture in an old commit (src/lib/redact.test.ts). The current
+# fixture carries a DUMMY marker; history is never rewritten, so the old copy is fingerprinted here.
+b5551dc7ec76e0612aed8eb7ae73f22b36ba8bcb:src/lib/redact.test.ts:stripe-access-token:20

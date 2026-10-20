@@ -17,7 +17,8 @@ describe("redact", () => {
   it("masks AWS, GitHub, and Stripe keys", () => {
     expect(redact("AKIAIOSFODNN7EXAMPLE")).toContain("[REDACTED:aws-access-key-id]");
     expect(redact("ghp_0123456789abcdef0123456789")).toContain("[REDACTED:github-pat]");
-    expect(redact("sk_live_DUMMYDUMMYDUMMYDUMMY00")).toContain("[REDACTED:stripe-secret-key]");
+    // Obviously fake (DUMMY marker), still Stripe-shaped so the stripe-secret-key rule is exercised.
+    expect(redact("sk_live_DUMMY0123456789DUMMY")).toContain("[REDACTED:stripe-secret-key]");
   });
 
   it("does not redact ordinary text", () => {
