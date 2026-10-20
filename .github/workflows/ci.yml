@@ -15,7 +15,9 @@ jobs:
       - name: Harness skeleton present
         run: |
           set -e
-          for f in identity/SOUL.md brain HARNESS-OVERRIDES.md MASTER-TODOS.md IMPLEMENTATION-NOTES.md dsip.json AGENTS.md CLAUDE.md llms.txt .claude-plugin/plugin.json .mcp.json; do
+          # The working notes (HARNESS-OVERRIDES.md, MASTER-TODOS.md, IMPLEMENTATION-NOTES.md) leave the repository
+          # before it goes public, so only the public skeleton is required.
+          for f in identity/SOUL.md brain dsip.json AGENTS.md CLAUDE.md llms.txt .claude-plugin/plugin.json .mcp.json; do
             [ -e "$f" ] || { echo "MISSING: $f"; exit 1; }
           done
           echo "harness skeleton OK"
