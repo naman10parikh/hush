@@ -105,4 +105,6 @@ The cockpit has its own Playwright test, run with `pnpm exec playwright test`.
 It has no secret store yet. `broker` returns a `hush://store/` handle and an expiry, but stores nothing.
 `inject` runs your command with your current environment and adds no secret to it.
 `remediate` and `rotate-plan` print plans. They never rewrite git history or rotate a key for you.
-When `age-keygen` is installed, `init` puts a new public key in `.sops.yaml` but does not save the private key. Replace that recipient with a key you keep.
+`init --sops` makes only the first age key, and only when `age-keygen` is installed. It appends the private key, at mode 600, to the keys file sops reads.
+That file is `$SOPS_AGE_KEY_FILE` if set. Otherwise it is `sops/age/keys.txt` in `$XDG_CONFIG_HOME`, or by default in `~/Library/Application Support` on macOS and `~/.config` on Linux.
+It does not make the break-glass key. Replace the second recipient in `.sops.yaml` with a key you keep offline.

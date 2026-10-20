@@ -7,8 +7,16 @@
  * left untouched and reported as "skipped".
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import {
+  appendFileSync,
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
+import { homedir } from "node:os";
+import { dirname, isAbsolute, join } from "node:path";
 import { generateEnvExample } from "./env-example.js";
 import { GITLEAKS_BASELINE_TOML, GITLEAKS_PINNED_VERSION } from "../scanners/gitleaks.js";
 import { TRUFFLEHOG_PINNED_VERSION } from "../scanners/trufflehog.js";
@@ -74,22 +82,101 @@ creation_rules:
 `;
 }
 
-function scaffoldSops(repo: string): ScaffoldStep[] {
-  // Try to self-generate an age key (SEC-1, no provider account). Degrade if absent.
-  let recipient = "age1REPLACEMEWITHYOURPRIMARYAGEPUBLICKEYxxxxxxxxxxxxxx";
-  let keyNote: string | undefined;
-  try {
-    const out = execFileSync("age-keygen", [], { encoding: "utf8" });
-    const m = /# public key: (age1[0-9a-z]+)/.exec(out);
-    if (m && m[1]) recipient = m[1];
-    keyNote =
-      "age key generated — store the PRIVATE key in ~/.config/sops/age/keys.txt (gitignored), NEVER in git";
-  } catch {
-    keyNote =
-      "age-keygen not installed — run `age-keygen -o ~/.config/sops/age/keys.txt` then replace the recipient";
+/**
+ * The age keys file sops reads by default: $SOPS_AGE_KEY_FILE, else
+ * <config dir>/sops/age/keys.txt. The config dir is $XDG_CONFIG_HOME when set,
+ * else ~/Library/Application Support on macOS, ~/.config on Linux and
+ * %AppData% on Windows (TOOL-MATRIX, "SOPS + age (decrypt)").
+ */
+export function sopsAgeKeyFile(
+  env: NodeJS.ProcessEnv = process.env,
+  platform: NodeJS.Platform = process.platform,
+  home: string = homedir(),
+): string {
+  if (env.SOPS_AGE_KEY_FILE) return env.SOPS_AGE_KEY_FILE;
+  let base = env.XDG_CONFIG_HOME || join(home, ".config");
+  if (platform === "darwin") {
+    base = env.XDG_CONFIG_HOME || join(home, "Library", "Application Support");
   }
+  if (platform === "win32") base = env.APPDATA || join(home, "AppData", "Roaming");
+  return join(base, "sops", "age", "keys.txt");
+}
+
+/**
+ * Add a key to the keys file at mode 600. An existing file is appended to,
+ * never overwritten. An encrypted keys file is refused: plain text after it
+ * would break it.
+ */
+function saveAgeKey(file: string, keyText: string): "created" | "appended" {
+  if (!existsSync(file)) {
+    mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
+    writeFileSync(file, keyText, { encoding: "utf8", mode: 0o600, flag: "wx" });
+    return "created";
+  }
+  const prev = readFileSync(file);
+  const head = prev.subarray(0, 14).toString("latin1");
+  if (head.startsWith("age-encryption") || head.startsWith("-----BEGIN AGE")) {
+    throw new Error("it is an encrypted keys file, and hush will not append plain text to it");
+  }
+  const sep = prev.length > 0 && prev[prev.length - 1] !== 0x0a ? "\n" : "";
+  appendFileSync(file, sep + keyText, "utf8");
+  chmodSync(file, 0o600);
+  return "appended";
+}
+
+const PLACEHOLDER_RECIPIENT = "age1REPLACEMEWITHYOURPRIMARYAGEPUBLICKEYxxxxxxxxxxxxxx";
+
+/**
+ * Self-generate the primary age key (SEC-1, no provider account). Its public
+ * key goes into .sops.yaml only once its private key is saved where sops looks,
+ * since nobody could decrypt for an unsaved key. The private key is never printed.
+ */
+function primaryAgeKey(): { recipient: string; note: string } {
+  const keyFile = sopsAgeKeyFile();
+  if (!isAbsolute(keyFile)) {
+    return {
+      recipient: PLACEHOLDER_RECIPIENT,
+      note: `no age key made: the keys file path (${keyFile}) is not absolute, so a key could land in the repo. Replace the recipient`,
+    };
+  }
+  let out: string;
+  try {
+    out = execFileSync("age-keygen", [], { encoding: "utf8" });
+  } catch {
+    return {
+      recipient: PLACEHOLDER_RECIPIENT,
+      note: `age-keygen not installed. Run \`age-keygen -o ${keyFile}\`, then replace the recipient`,
+    };
+  }
+  const recipient = /# public key: (age1[0-9a-z]+)/.exec(out)?.[1];
+  if (!recipient || !/^AGE-SECRET-KEY-1/m.test(out)) {
+    return {
+      recipient: PLACEHOLDER_RECIPIENT,
+      note: "age-keygen output not recognised, so no key was saved. Replace the recipient with your own",
+    };
+  }
+  try {
+    const how = saveAgeKey(keyFile, out);
+    return {
+      recipient,
+      note: `age key generated. Private key ${how === "created" ? "saved to" : "appended to"} ${keyFile} (mode 600), where sops looks for it. Only its public key is in .sops.yaml`,
+    };
+  } catch (err) {
+    return {
+      recipient: PLACEHOLDER_RECIPIENT,
+      note: `age key not saved to ${keyFile}: ${err instanceof Error ? err.message : String(err)}. Replace the recipient with a key you keep`,
+    };
+  }
+}
+
+function scaffoldSops(repo: string): ScaffoldStep[] {
+  // An existing .sops.yaml is left alone, so no key is generated for it.
+  if (existsSync(join(repo, ".sops.yaml"))) {
+    return [{ file: ".sops.yaml", status: "skipped-exists" }];
+  }
+  const { recipient, note } = primaryAgeKey();
   const step = writeIfAbsent(repo, ".sops.yaml", sopsYaml(recipient));
-  return [{ ...step, note: keyNote }];
+  return [{ ...step, note }];
 }
 
 export interface InitFlags {
