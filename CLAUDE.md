@@ -47,13 +47,13 @@ git-filter-repo `2.47.0`. **Pin + test after every bump** (`O-14`); prefer check
 (the CLI) · `skills/` + `.claude/skills` · `hooks/` + `.claude/hooks` (the secret-scan gate) ·
 `.claude/agents` (sub-agents) · `.mcp.json` + `src/mcp` (the MCP server) · `src/dispatch` + `workflows/`
 (routing + RSI) · `eval/` (golden tasks + observer). Same formula as every Energy harness, different
-data. Per-component DONE-criteria: `HARNESS-OVERRIDES.md`.
+data.
 
 ## The acceptance bar
 
 `hush scan` on a repo containing a planted dummy key flags it (nonzero exit) **and** `hush doctor`
 reports the secret-manager wiring of that repo — green in CI, $0/offline (gitleaks only, no provider
-account, no network). Detail: `PLAN.md` §5.
+account, no network).
 
 ## Dogfood (hush practices what it preaches — JOB 1 on its own repo)
 
