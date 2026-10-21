@@ -20,7 +20,7 @@ Hush is an agent employee, a packaged specialist agent with its own skills, memo
 
 _Hush is part of an agent-native play for agent-native systems that can eventually be recursively self-improving and evolving, operated by agent employees._
 
-<p align="center"><img alt="Hush: on the command line" src="assets/terminal.svg" width="880"></p>
+<p align="center"><img alt="Hush: a real task, run offline" src="assets/demo.svg" width="880"></p>
 <!-- fleet:header:end -->
 
 Its job is to keep secrets out of git, out of logs and out of an agent's context. When a key leaks, hush gives
